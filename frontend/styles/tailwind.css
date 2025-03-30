@@ -1,4 +1,18 @@
-/* Custom CSS additions */
+/* Custom CSS additions - Dark Mode Only */
+
+/* Dark mode colors */
+:root {
+  --bg-primary: #1a202c; /* gray-900 */
+  --bg-secondary: #2d3748; /* gray-800 */
+  --bg-tertiary: #4a5568; /* gray-700 */
+  --text-primary: #f7fafc; /* gray-100 */
+  --text-secondary: #cbd5e0; /* gray-400 */
+  --accent: #3182ce; /* blue-600 */
+  --accent-light: #63b3ed; /* blue-400 */
+  --border: #4a5568; /* gray-700 */
+  --error: #f56565; /* red-500 */
+  --success: #48bb78; /* green-500 */
+}
 
 /* Progress bar animation */
 @keyframes progressFill {
@@ -29,11 +43,43 @@
 
 .hover-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+  border-color: #3182ce; /* blue-600 */
 }
 
 /* Better focus styling for accessibility */
 button:focus, select:focus, a:focus {
-  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline: 2px solid rgba(79, 170, 250, 0.7);
   outline-offset: 2px;
+}
+
+/* Dark mode scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #2d3748; /* gray-800 */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4a5568; /* gray-700 */
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3182ce; /* blue-600 */
+}
+
+/* Form elements styling */
+select, input {
+  background-color: #374151; /* gray-700 */
+  border-color: #4b5563; /* gray-600 */
+  color: #f9fafb; /* gray-50 */
+}
+
+select:focus, input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
 }
