@@ -15,7 +15,7 @@ interface TrelloCard {
   name: string;
   idList: string;
   labels: TrelloLabel[];
-  customFields?: TrelloCustomField[];
+  customFieldItems?: TrelloCustomFieldItem[];
   closed: boolean;
 }
 
@@ -30,12 +30,16 @@ interface TrelloList {
   name: string;
 }
 
-interface TrelloCustomField {
+interface TrelloCustomFieldItem {
   id: string;
-  name?: string;
+  idCustomField: string;
+  idValue?: string;
+  idModel?: string;
+  modelType?: string;
   value?: {
     text?: string;
     number?: number;
+    checked?: string;
   };
 }
 
@@ -43,6 +47,17 @@ interface TrelloCustomFieldDefinition {
   id: string;
   name: string;
   type: string;
+  options?: TrelloCustomFieldOption[];
+}
+
+interface TrelloCustomFieldOption {
+  id: string;
+  idCustomField?: string;
+  value: {
+    text: string;
+  };
+  color?: string;
+  pos?: number;
 }
 
 interface SanitizedBoardData {
@@ -70,23 +85,24 @@ interface SanitizedBoardData {
 // Callable version of the Firebase Function
 export const fetchTrelloBoard = functions.https.onCall(async (data, context) => {
   try {
-    // For callable functions, data should be an object with properties
-    // Extract boardId from the data parameter
-    let boardId: string | undefined = data.data.boardId;
-    
-    if (!boardId) {
-      throw new functions.https.HttpsError('invalid-argument', 'Board ID is required');
-    }
+  // For callable functions, data should be an object with properties
+  // Extract boardId from the data parameter
+  let boardId: string | undefined = data.data.boardId;
+  
+  if (!boardId) {
+  throw new functions.https.HttpsError('invalid-argument', 'Board ID is required');
+  }
 
-    const apiKey = process.env.TRELLO_API_KEY;
-    const token = process.env.TRELLO_TOKEN;
+  const apiKey = process.env.TRELLO_API_KEY;
+  const token = process.env.TRELLO_TOKEN;
 
-    if (!apiKey || !token) {
-      console.error("Trello API credentials not configured");
-      throw new functions.https.HttpsError('internal', 'Server configuration error: Missing API credentials');
-    }
+  if (!apiKey || !token) {
+  console.error("Trello API credentials not configured");
+  throw new functions.https.HttpsError('internal', 'Server configuration error: Missing API credentials');
+  }
 
     try {
+      // Fetch board data from Trello
       // Fetch board data from Trello
       const [cardsResponse, listsResponse, customFieldsResponse] =
         await Promise.all([
@@ -94,7 +110,7 @@ export const fetchTrelloBoard = functions.https.onCall(async (data, context) => 
             params: {
               key: apiKey,
               token: token,
-              customFieldItems: true,
+              customFieldItems: "true",
             },
           }),
           axios.get(`https://api.trello.com/1/boards/${boardId}/lists`, {
@@ -110,13 +126,30 @@ export const fetchTrelloBoard = functions.https.onCall(async (data, context) => 
             },
           }),
         ]);
+      
+      // Process the custom field definitions to fetch options for dropdown fields
+      const customFieldDefinitions: TrelloCustomFieldDefinition[] = customFieldsResponse.data;
+      
+      // For any 'list' type custom fields, fetch their options
+      for (const field of customFieldDefinitions) {
+        if (field.type === 'list') {
+          try {
+            const optionsResponse = await axios.get(`https://api.trello.com/1/customFields/${field.id}/options`, {
+              params: {
+                key: apiKey,
+                token: token,
+              },
+            });
+            field.options = optionsResponse.data;
+          } catch (error) {
+            // Silently handle error - options will remain undefined
+          }
+        }
+      }
       // Process API responses
-
       const cards: TrelloCard[] = cardsResponse.data;
       const lists: TrelloList[] = listsResponse.data;
-      const customFieldDefinitions: TrelloCustomFieldDefinition[] =
-        customFieldsResponse.data;
-
+      
       // Process and sanitize data
       const sanitizedData: SanitizedBoardData = {
         cards: [],
@@ -137,92 +170,157 @@ export const fetchTrelloBoard = functions.https.onCall(async (data, context) => 
       });
 
       // Process each card
-      cards.forEach((card) => {
-        // Skip archived/closed cards
-        if (card.closed) return;
+      const processCards = async () => {
+        // Process the cards sequentially to ensure we don't overwhelm the Trello API with requests
+        for (const card of cards) {
+          // Skip archived/closed cards
+          if (card.closed) continue;
 
-        // Collect unique labels
-        card.labels.forEach((label) => {
-          if (!uniqueLabels.has(label.id)) {
-            uniqueLabels.set(label.id, label);
-            sanitizedData.labels.push({
-              id: label.id,
-              name: label.name,
-              color: label.color,
-            });
+          // Collect unique labels
+          card.labels.forEach((label) => {
+            if (!uniqueLabels.has(label.id)) {
+              uniqueLabels.set(label.id, label);
+              sanitizedData.labels.push({
+                id: label.id,
+                name: label.name,
+                color: label.color,
+              });
+            }
+          });
+
+          // Determine card status based on list position
+          let status: "complete" | "in-progress" | "not-started" = "not-started";
+          const list = lists.find((l) => l.id === card.idList);
+          
+          if (list) {
+            const listNameLower = list.name.toLowerCase();
+            if (listNameLower.includes("done") ||
+                listNameLower.includes("complete")) {
+              status = "complete";
+            } else if (
+              listNameLower.includes("progress") || 
+              listNameLower.includes("doing") || 
+              listNameLower.includes("review")
+            ) {
+              status = "in-progress";
+            }
           }
-        });
 
-        // Determine card status based on list position
-        let status: "complete" | "in-progress" | "not-started" = "not-started";
-        const list = lists.find((l) => l.id === card.idList);
-        
-        if (list) {
-          const listNameLower = list.name.toLowerCase();
-          if (listNameLower.includes("done") ||
-              listNameLower.includes("complete")) {
-            status = "complete";
-          } else if (
-            listNameLower.includes("progress") || 
-            listNameLower.includes("doing") || 
-            listNameLower.includes("review")
-          ) {
-            status = "in-progress";
-          }
-        }
+          // Extract custom field values
+          let estimatedHours: number | undefined;
+          let system: string | undefined;
 
-        // Extract custom field values
-        let estimatedHours: number | undefined;
-        let system: string | undefined;
-
-        if (card.customFields) {
-          card.customFields.forEach((field) => {
-            const fieldName = customFieldMap.get(field.id);
-            
-            if (fieldName && field.value) {
-              if (fieldName.toLowerCase().includes("est") ||
-                  fieldName.toLowerCase().includes("hour")) {
-                if (field.value.number !== undefined) {
-                  estimatedHours = field.value.number;
-                } else if (field.value.text !== undefined) {
-                  const parsed = parseFloat(field.value.text);
-                  if (!isNaN(parsed)) {
-                    estimatedHours = parsed;
+          if (card.customFieldItems) {
+            for (const field of card.customFieldItems) {
+              const fieldName = customFieldMap.get(field.idCustomField);
+              const customFieldDef = customFieldDefinitions.find(def => def.id === field.idCustomField);
+              
+              // Check if this is a field about estimated hours
+              if (fieldName && (fieldName.toLowerCase().includes("est") || fieldName.toLowerCase().includes("hour"))) {
+                if (field.value) {
+                  if (field.value.number !== undefined) {
+                    // Cap and sanitize the value to prevent extreme numbers
+                    const numValue = field.value.number;
+                    if (isFinite(numValue) && numValue >= 0 && numValue <= 10000) {
+                      estimatedHours = numValue;
+                    } else {
+                      estimatedHours = 0; // Use 0 as a fallback for invalid values
+                    }
+                  } else if (field.value.text !== undefined) {
+                    const parsed = parseFloat(field.value.text);
+                    if (!isNaN(parsed) && isFinite(parsed) && parsed >= 0 && parsed <= 10000) {
+                      estimatedHours = parsed;
+                    }
                   }
                 }
               }
               
-              if (fieldName.toLowerCase().includes("system") ||
-                  fieldName.toLowerCase().includes("module")) {
-                system = field.value.text;
+              // Check if this is a system/module field
+              if (fieldName && (fieldName.toLowerCase().includes("system") || fieldName.toLowerCase().includes("module"))) {
+                // Handle different types of custom fields
+                if (customFieldDef) {
+                  if (customFieldDef.type === 'text' && field.value?.text) {
+                    // For text fields, use the text value directly
+                    system = field.value.text;
+                  } else if ((customFieldDef.type === 'list' || customFieldDef.type === 'dropdown') && field.idValue) {
+                    // For dropdown fields, look up the option text using the idValue
+                    if (customFieldDef.options && customFieldDef.options.length > 0) {
+                      const option = customFieldDef.options.find(opt => opt.id === field.idValue);
+                      if (option && option.value && option.value.text) {
+                        system = option.value.text;
+                      } else {
+                        // If we can't find the option, try to fetch it directly
+                        try {
+                          const optionResponse = await axios.get(`https://api.trello.com/1/customFields/${field.idCustomField}/options/${field.idValue}`, {
+                            params: {
+                              key: apiKey,
+                              token: token,
+                            }
+                          });
+                          
+                          if (optionResponse.data && optionResponse.data.value && optionResponse.data.value.text) {
+                            system = optionResponse.data.value.text;
+                            
+                            // Store this option for future reference
+                            if (!customFieldDef.options) customFieldDef.options = [];
+                            customFieldDef.options.push(optionResponse.data);
+                          }
+                        } catch (error) {
+                        // Silently handle error
+                        }
+                      }
+                    } else {
+                      // If no options were found earlier, try to fetch this specific option
+                      try {
+                        const optionResponse = await axios.get(`https://api.trello.com/1/customFields/${field.idCustomField}/options/${field.idValue}`, {
+                          params: {
+                            key: apiKey,
+                            token: token,
+                          }
+                        });
+                        
+                        if (optionResponse.data && optionResponse.data.value && optionResponse.data.value.text) {
+                          system = optionResponse.data.value.text;
+                          
+                          // Initialize options array and store this option
+                          if (!customFieldDef.options) customFieldDef.options = [];
+                          customFieldDef.options.push(optionResponse.data);
+                        }
+                      } catch (error) {
+                        // Silently handle error
+                      }
+                    }
+                  }
+                }
               }
             }
+          }
+
+          // Add sanitized card data
+          sanitizedData.cards.push({
+            id: card.id,
+            name: card.name,
+            listId: card.idList,
+            labels: card.labels.map((label) => label.name),
+            labelColors: card.labels.map((label) => label.color),
+            estimatedHours,
+            system,
+            status,
           });
         }
-
-        // Add sanitized card data
-        sanitizedData.cards.push({
-          id: card.id,
-          name: card.name,
-          listId: card.idList,
-          labels: card.labels.map((label) => label.name),
-          labelColors: card.labels.map((label) => label.color),
-          estimatedHours,
-          system,
-          status,
-        });
-      });
-
-      // Return the sanitized data
+      };
       
+      // Run the async card processing
+      await processCards();
+      
+      // Return the sanitized data
       return sanitizedData;
     } catch (error: unknown) {
-      console.error("Error making Trello API calls:", error);
-      
       // Check for authentication errors
       const axiosError = error as { response?: { status: number; data?: any } };
       const isAuthError = axiosError.response && axiosError.response.status === 401;
       
+      // Re-throw the error with appropriate Firebase format
       throw new functions.https.HttpsError(
         isAuthError ? 'unauthenticated' : 'internal',
         isAuthError ? 'Trello API authentication failed' : 'Failed to fetch Trello data',
@@ -230,8 +328,6 @@ export const fetchTrelloBoard = functions.https.onCall(async (data, context) => 
       );
     }
   } catch (error: unknown) {
-    console.error("Error in callable function:", error instanceof Error ? error.message : "Unknown error");
-    
     // Determine the appropriate error code
     let errorCode: functions.https.FunctionsErrorCode = 'internal';
     let errorMessage = 'Failed to fetch board data';

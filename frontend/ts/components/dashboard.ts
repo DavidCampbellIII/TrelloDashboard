@@ -3,6 +3,14 @@
 import { TrelloCard, TrelloBoardData, ProgressStats, DepartmentStats, SystemStats } from '../utils/typeAdapter';
 import { isCardCompleted, calculateProgress } from '../utils/dataProcessing';
 
+/**
+ * Helper function to format hours display
+ */
+function formatHours(hours: number): number {
+  // Round to one decimal place
+  return Math.round(hours * 10) / 10;
+}
+
 // DOM element references
 const overallCompletionPercent = document.getElementById('overall-completion-percent');
 const overallProgressBar = document.getElementById('overall-progress-bar');
@@ -45,10 +53,11 @@ export function populateFilters(
   // Extract unique system names from custom fields
   const systems = new Set<string>();
   boardData.cards.forEach(card => {
-    if (card.customFields.system) {
+    if (card.customFields && card.customFields.system) {
       systems.add(card.customFields.system);
     }
   });
+  
   
   // Add system options
   systems.forEach(system => {
@@ -57,6 +66,16 @@ export function populateFilters(
     option.textContent = system;
     systemFilter.appendChild(option);
   });
+  
+  // If no systems were found, add a message
+  if (systems.size === 0) {
+    console.warn('No systems found in board data');
+    const option = document.createElement('option');
+    option.value = 'no-systems';
+    option.textContent = 'No systems found';
+    option.disabled = true;
+    systemFilter.appendChild(option);
+  }
 }
 
 /**
@@ -66,21 +85,21 @@ export function updateOverallProgress(cards: TrelloCard[], boardData: TrelloBoar
   const progress = calculateProgress(cards, boardData);
   
   if (overallCompletionPercent) {
-    overallCompletionPercent.textContent = `${progress.completionPercentage}%`;
+    overallCompletionPercent.textContent = `${Math.round(progress.completionPercentage)}%`;
   }
   
   if (overallProgressBar) {
-    overallProgressBar.style.setProperty('--target-width', `${progress.completionPercentage}%`);
+    overallProgressBar.style.setProperty('--target-width', `${Math.round(progress.completionPercentage)}%`);
     overallProgressBar.style.width = '0%';
     overallProgressBar.classList.remove('progress-bar-animated');
     // Trigger reflow to restart animation
     void overallProgressBar.offsetWidth;
     overallProgressBar.classList.add('progress-bar-animated');
-    overallProgressBar.style.width = `${progress.completionPercentage}%`;
+    overallProgressBar.style.width = `${Math.round(progress.completionPercentage)}%`;
   }
   
   if (overallHours) {
-    overallHours.textContent = `${progress.completedHours}/${progress.totalHours} hrs`;
+    overallHours.textContent = `${formatHours(progress.completedHours)}/${formatHours(progress.totalHours)} hrs`;
   }
   
   // Update department hours chart
@@ -155,11 +174,11 @@ function updateDepartmentHours(cards: TrelloCard[], boardData: TrelloBoardData) 
     departmentElement.innerHTML = `
       <div class="flex justify-between mb-1">
         <span class="text-sm font-medium text-gray-700">${dept}</span>
-        <span class="text-sm font-medium text-gray-700">${stats.completedHours}/${stats.totalHours} hrs</span>
+        <span class="text-sm font-medium text-gray-700">${formatHours(stats.completedHours)}/${formatHours(stats.totalHours)} hrs</span>
       </div>
       <div class="w-full bg-gray-200 rounded-full h-2">
         <div class="label-${stats.color} h-2 rounded-full progress-bar-animated" 
-             style="--target-width: ${percentage}%"></div>
+             style="--target-width: ${Math.round(percentage)}%"></div>
       </div>
     `;
     
@@ -187,7 +206,7 @@ function updateSystemHours(cards: TrelloCard[], boardData: TrelloBoardData) {
     const system = card.customFields.system;
     if (!system) return;
     
-    const hours = card.customFields.estimatedHours || 0;
+    const hours = card.customFields.estimatedHours ?? 0;
     const isComplete = isCardCompleted(card, boardData);
     
     if (!systemMap.has(system)) {
@@ -226,11 +245,11 @@ function updateSystemHours(cards: TrelloCard[], boardData: TrelloBoardData) {
     systemElement.innerHTML = `
       <div class="flex justify-between mb-1">
         <span class="text-sm font-medium text-gray-700">${system}</span>
-        <span class="text-sm font-medium text-gray-700">${stats.completedHours}/${stats.totalHours} hrs</span>
+        <span class="text-sm font-medium text-gray-700">${formatHours(stats.completedHours)}/${formatHours(stats.totalHours)} hrs</span>
       </div>
       <div class="w-full bg-gray-200 rounded-full h-2">
         <div class="bg-blue-600 h-2 rounded-full progress-bar-animated" 
-             style="--target-width: ${percentage}%"></div>
+             style="--target-width: ${Math.round(percentage)}%"></div>
       </div>
     `;
     
@@ -283,15 +302,15 @@ export function updateDepartmentProgress(cards: TrelloCard[], boardData: TrelloB
     departmentElement.innerHTML = `
       <div class="flex justify-between mb-1">
         <span class="font-medium">${stats.department}</span>
-        <span class="text-sm font-medium">${stats.completionPercentage}% complete</span>
+        <span class="text-sm font-medium">${Math.round(stats.completionPercentage)}% complete</span>
       </div>
       <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
         <div class="label-${stats.color} h-2.5 rounded-full progress-bar-animated" 
-             style="--target-width: ${stats.completionPercentage}%"></div>
+             style="--target-width: ${Math.round(stats.completionPercentage)}%"></div>
       </div>
       <div class="flex justify-between text-xs text-gray-500">
         <span>${stats.completedCards}/${stats.totalCards} tasks</span>
-        <span>${stats.completedHours}/${stats.totalHours} hours</span>
+        <span>${formatHours(stats.completedHours)}/${formatHours(stats.totalHours)} hours</span>
       </div>
     `;
     
@@ -350,15 +369,15 @@ export function updateSystemProgress(cards: TrelloCard[], boardData: TrelloBoard
     systemElement.innerHTML = `
       <div class="flex justify-between mb-1">
         <span class="font-medium">${stats.system}</span>
-        <span class="text-sm font-medium">${stats.completionPercentage}% complete</span>
+        <span class="text-sm font-medium">${Math.round(stats.completionPercentage)}% complete</span>
       </div>
       <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
         <div class="bg-blue-600 h-2.5 rounded-full progress-bar-animated" 
-             style="--target-width: ${stats.completionPercentage}%"></div>
+             style="--target-width: ${Math.round(stats.completionPercentage)}%"></div>
       </div>
       <div class="flex justify-between text-xs text-gray-500">
         <span>${stats.completedCards}/${stats.totalCards} tasks</span>
-        <span>${stats.completedHours}/${stats.totalHours} hours</span>
+        <span>${formatHours(stats.completedHours)}/${formatHours(stats.totalHours)} hours</span>
       </div>
     `;
     
@@ -431,15 +450,15 @@ export function updateDetailedBreakdown(cards: TrelloCard[], boardData: TrelloBo
       systemElement.innerHTML = `
         <div class="flex justify-between mb-1">
           <span class="font-medium">${system}</span>
-          <span class="text-sm font-medium">${progress.completionPercentage}% complete</span>
+          <span class="text-sm font-medium">${Math.round(progress.completionPercentage)}% complete</span>
         </div>
         <div class="w-full bg-gray-200 rounded-full h-2 mb-1">
           <div class="label-${departmentColor} h-2 rounded-full progress-bar-animated" 
-               style="--target-width: ${progress.completionPercentage}%"></div>
+               style="--target-width: ${Math.round(progress.completionPercentage)}%"></div>
         </div>
         <div class="flex justify-between text-xs text-gray-500 mb-2">
           <span>${progress.completedCards}/${progress.totalCards} tasks</span>
-          <span>${progress.completedHours}/${progress.totalHours} hours</span>
+          <span>${formatHours(progress.completedHours)}/${formatHours(progress.totalHours)} hours</span>
         </div>
       `;
       
