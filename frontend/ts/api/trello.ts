@@ -52,7 +52,6 @@ export async function fetchBoardData(boardId: string = DEFAULT_BOARD_ID): Promis
     
     return result.data as SanitizedBoardData;
   } catch (error) {
-    console.error('Error fetching Trello board data:', error);
     throw error;
   }
 }
@@ -163,13 +162,10 @@ export function calculateHours(cards: SanitizedCard[]): { total: number; remaini
     if (card.estimatedHours !== undefined) {
       totalHours += card.estimatedHours;
       
-      // Add hours based on completion status
-      if (card.status === 'not-started') {
+      //add hours if not complete
+      if (card.status !== 'complete') {
         remainingHours += card.estimatedHours;
-      } else if (card.status === 'in-progress') {
-        remainingHours += card.estimatedHours * 0.5; // Assume 50% remaining for in-progress
       }
-      // Complete tasks have 0 remaining hours
     }
   });
   

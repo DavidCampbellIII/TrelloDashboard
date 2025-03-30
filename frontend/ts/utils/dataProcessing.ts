@@ -29,11 +29,14 @@ export function calculateProgress(cards: TrelloCard[], boardData: TrelloBoardDat
   let completedHours = 0;
   
   cards.forEach(card => {
-    const hours = card.customFields.estimatedHours || 0;
-    totalHours += hours;
-    
-    if (isCardCompleted(card, boardData)) {
-      completedHours += hours;
+    const hours = card.customFields.estimatedHours ?? 0;
+    // Ensure hours are valid and within reasonable range
+    if (isFinite(hours) && hours >= 0 && hours <= 10000) {
+      totalHours += hours;
+      
+      if (isCardCompleted(card, boardData)) {
+        completedHours += hours;
+      }
     }
   });
   
