@@ -75,13 +75,20 @@ export function convertToTrelloBoardData(data: SanitizedBoardData): TrelloBoardD
       };
     });
     
+    // Validate the estimated hours to ensure they're within a reasonable range
+    const validatedHours = card.estimatedHours !== undefined 
+      ? (isFinite(card.estimatedHours) && card.estimatedHours >= 0 && card.estimatedHours <= 10000
+          ? card.estimatedHours
+          : 0)
+      : undefined;
+      
     return {
       id: card.id,
       name: card.name,
       listId: card.listId,
       labels: cardLabels,
       customFields: {
-        estimatedHours: card.estimatedHours,
+        estimatedHours: validatedHours,
         system: card.system
       }
     };

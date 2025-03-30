@@ -7,7 +7,10 @@ import { isCardCompleted, calculateProgress } from '../utils/dataProcessing';
  * Helper function to format hours display
  */
 function formatHours(hours: number): number {
-  // Round to one decimal place
+  // Validate hours and round to one decimal place
+  if (!isFinite(hours) || hours < 0 || hours > 10000) {
+    return 0;
+  }
   return Math.round(hours * 10) / 10;
 }
 
@@ -138,16 +141,20 @@ function updateDepartmentHours(cards: TrelloCard[], boardData: TrelloBoardData) 
   
   // Calculate hours for each department
   cards.forEach(card => {
-    const hours = card.customFields.estimatedHours || 0;
+    // Get hours and validate they're within a reasonable range
+    const rawHours = card.customFields.estimatedHours || 0;
+    // Explicitly convert to number and ensure valid range
+    const hoursValue = typeof rawHours === 'string' ? Number(rawHours) : Number(rawHours);
+    const hours = isFinite(hoursValue) && hoursValue >= 0 && hoursValue <= 10000 ? hoursValue : 0;
     const isComplete = isCardCompleted(card, boardData);
     
     card.labels.forEach(label => {
       if (label.name && departmentMap.has(label.name)) {
         const deptStats = departmentMap.get(label.name)!;
-        deptStats.totalHours += hours;
+        deptStats.totalHours = Number(deptStats.totalHours) + Number(hours);
         
         if (isComplete) {
-          deptStats.completedHours += hours;
+          deptStats.completedHours = Number(deptStats.completedHours) + Number(hours);
         }
       }
     });
@@ -206,7 +213,11 @@ function updateSystemHours(cards: TrelloCard[], boardData: TrelloBoardData) {
     const system = card.customFields.system;
     if (!system) return;
     
-    const hours = card.customFields.estimatedHours ?? 0;
+    // Get hours and validate they're within a reasonable range
+    const rawHours = card.customFields.estimatedHours ?? 0;
+    // Explicitly convert to number and ensure valid range
+    const hoursValue = Number(rawHours);
+    const hours = isFinite(hoursValue) && hoursValue >= 0 && hoursValue <= 10000 ? hoursValue : 0;
     const isComplete = isCardCompleted(card, boardData);
     
     if (!systemMap.has(system)) {
@@ -217,10 +228,10 @@ function updateSystemHours(cards: TrelloCard[], boardData: TrelloBoardData) {
     }
     
     const systemStats = systemMap.get(system)!;
-    systemStats.totalHours += hours;
+    systemStats.totalHours = Number(systemStats.totalHours) + Number(hours);
     
     if (isComplete) {
-      systemStats.completedHours += hours;
+      systemStats.completedHours = Number(systemStats.completedHours) + Number(hours);
     }
   });
   
