@@ -63,7 +63,6 @@ interface TrelloCustomFieldOption {
 interface SanitizedBoardData {
   cards: {
     id: string;
-    name: string;
     listId: string;
     labels: string[];
     labelColors: string[];
@@ -296,10 +295,10 @@ export const fetchTrelloBoard = functions.https.onCall(async (data, context) => 
             }
           }
 
-          // Add sanitized card data
+          // Add sanitized card data (excluding names for privacy protection)
           sanitizedData.cards.push({
             id: card.id,
-            name: card.name,
+            // name field intentionally omitted for privacy
             listId: card.idList,
             labels: card.labels.map((label) => label.name),
             labelColors: card.labels.map((label) => label.color),

@@ -19,7 +19,6 @@ export interface TrelloCustomFields {
 
 export interface TrelloCard {
   id: string;
-  name: string;
   listId: string;
   labels: TrelloLabel[];
   customFields: TrelloCustomFields;
@@ -84,7 +83,6 @@ export function convertToTrelloBoardData(data: SanitizedBoardData): TrelloBoardD
       
     return {
       id: card.id,
-      name: card.name,
       listId: card.listId,
       labels: cardLabels,
       customFields: {

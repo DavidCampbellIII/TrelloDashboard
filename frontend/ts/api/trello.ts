@@ -8,7 +8,6 @@ import { getApp } from "firebase/app";
 // Define interfaces for the sanitized Trello board data that we receive from Firebase Functions
 export interface SanitizedCard {
   id: string;
-  name: string;
   listId: string;
   labels: string[];
   labelColors: string[];
