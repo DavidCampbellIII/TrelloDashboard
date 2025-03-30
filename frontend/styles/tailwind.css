@@ -25,6 +25,7 @@
 }
 
 /* Custom color classes for Trello labels */
+/* Base colors */
 .label-red { background-color: #eb5a46; }
 .label-orange { background-color: #ff9f1a; }
 .label-yellow { background-color: #f2d600; }
@@ -35,6 +36,30 @@
 .label-sky { background-color: #00c2e0; }
 .label-lime { background-color: #51e898; }
 .label-black { background-color: #344563; }
+
+/* Light variants (subtle/darker in Trello's scheme) */
+.label-red_light { background-color: #b04632; }
+.label-orange_light { background-color: #d68000; }
+.label-yellow_light { background-color: #d9b51c; }
+.label-green_light { background-color: #4a913c; }
+.label-blue_light { background-color: #055a8c; }
+.label-purple_light { background-color: #a15da6; }
+.label-pink_light { background-color: #e362b5; }
+.label-sky_light { background-color: #0098b7; }
+.label-lime_light { background-color: #42b883; }
+.label-black_light { background-color: #292e3a; }
+
+/* Dark variants (bold/brighter in Trello's scheme) */
+.label-red_dark { background-color: #f5a397; }
+.label-orange_dark { background-color: #ffbc5c; }
+.label-yellow_dark { background-color: #f5e056; }
+.label-green_dark { background-color: #8ed082; }
+.label-blue_dark { background-color: #5eaadf; }
+.label-purple_dark { background-color: #d9a6eb; }
+.label-pink_dark { background-color: #ff9fd8; }
+.label-sky_dark { background-color: #67d7eb; }
+.label-lime_dark { background-color: #85eeb2; }
+.label-black_dark { background-color: #6b798c; }
 
 /* Hover effects for interactive elements */
 .hover-card {
