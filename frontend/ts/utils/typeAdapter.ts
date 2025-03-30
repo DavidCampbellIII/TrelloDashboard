@@ -38,9 +38,12 @@ export interface TrelloBoardData {
 export interface ProgressStats {
   totalCards: number;
   completedCards: number;
+  inProgressCards: number;
   totalHours: number;
   completedHours: number;
+  inProgressHours: number;
   completionPercentage: number;
+  inProgressPercentage: number;
 }
 
 export interface DepartmentStats extends ProgressStats {
