@@ -25,17 +25,21 @@ export function calculateProgress(cards: TrelloCard[], boardData: TrelloBoardDat
   const totalCards = cards.length;
   const completedCards = cards.filter(card => isCardCompleted(card, boardData)).length;
   
-  let totalHours = 0;
-  let completedHours = 0;
+  let totalHours: number = 0;
+  let completedHours: number = 0;
   
   cards.forEach(card => {
-    const hours = card.customFields.estimatedHours ?? 0;
+    // Explicitly parse and convert hours to number
+    const hoursValue = card.customFields.estimatedHours ?? 0;
+    const hours: number = Number(hoursValue);
+    
     // Ensure hours are valid and within reasonable range
     if (isFinite(hours) && hours >= 0 && hours <= 10000) {
-      totalHours += hours;
+      // Explicitly add as numbers
+      totalHours = Number(totalHours) + Number(hours);
       
       if (isCardCompleted(card, boardData)) {
-        completedHours += hours;
+        completedHours = Number(completedHours) + Number(hours);
       }
     }
   });
