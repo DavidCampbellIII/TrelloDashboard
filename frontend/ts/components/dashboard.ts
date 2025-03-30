@@ -1,7 +1,19 @@
 // Dashboard UI components
 
 import { TrelloCard, TrelloBoardData, ProgressStats, DepartmentStats, SystemStats } from '../utils/typeAdapter';
-import { isCardCompleted, calculateProgress } from '../utils/dataProcessing';
+import { isCardCompleted, isCardInProgress, calculateProgress } from '../utils/dataProcessing';
+
+// When a color variant (light/dark) is used, add -faded to get faded version
+function getFadedColorClass(colorClass: string): string {
+  // Check if it's a variant (contains underscore)
+  if (colorClass.includes('_')) {
+    // For variants like 'red_light' or 'blue_dark'
+    return `${colorClass}-faded`;
+  } else {
+    // For regular colors like 'red' or 'blue'
+    return `${colorClass}-faded`;
+  }
+}
 
 /**
  * Helper function to format hours display
@@ -88,21 +100,50 @@ export function updateOverallProgress(cards: TrelloCard[], boardData: TrelloBoar
   const progress = calculateProgress(cards, boardData);
   
   if (overallCompletionPercent) {
-    overallCompletionPercent.textContent = `${Math.round(progress.completionPercentage)}%`;
+    // Only show completed percentage, not combined percentage
+    const completeText = Math.round(progress.completionPercentage);
+    overallCompletionPercent.textContent = `${completeText}%`;
+    
+    // Add a note to indicate how much is in progress
+    const inProgressText = Math.round(progress.inProgressPercentage);
+    overallCompletionPercent.setAttribute('title', `${completeText}% complete, ${inProgressText}% in progress`);
   }
   
   if (overallProgressBar) {
-    overallProgressBar.style.setProperty('--target-width', `${Math.round(progress.completionPercentage)}%`);
-    overallProgressBar.style.width = '0%';
-    overallProgressBar.classList.remove('progress-bar-animated');
-    // Trigger reflow to restart animation
-    void overallProgressBar.offsetWidth;
-    overallProgressBar.classList.add('progress-bar-animated');
-    overallProgressBar.style.width = `${Math.round(progress.completionPercentage)}%`;
+    // Clear the existing progress bar
+    overallProgressBar.innerHTML = '';
+    
+    // Create the completed portion
+    const completedPart = document.createElement('div');
+    completedPart.className = 'bg-blue-500 h-2.5 rounded-l-full progress-bar-animated';
+    completedPart.style.width = `${Math.round(progress.completionPercentage)}%`;
+    completedPart.style.setProperty('--target-width', `${Math.round(progress.completionPercentage)}%`);
+    completedPart.style.float = 'left';
+    
+    // Create the in-progress portion
+    const inProgressPart = document.createElement('div');
+    inProgressPart.className = 'bg-blue-faded h-2.5 progress-bar-animated';
+    inProgressPart.style.width = `${Math.round(progress.inProgressPercentage)}%`;
+    inProgressPart.style.setProperty('--target-width', `${Math.round(progress.inProgressPercentage)}%`);
+    inProgressPart.style.float = 'left';
+    
+    // Add rounded right edge to the in-progress part only if it's the end of the bar
+    if (progress.inProgressPercentage > 0) {
+      inProgressPart.classList.add('rounded-r-full');
+    } else {
+      completedPart.classList.add('rounded-r-full');
+    }
+    
+    // Append both parts to the progress bar
+    overallProgressBar.appendChild(completedPart);
+    overallProgressBar.appendChild(inProgressPart);
   }
   
   if (overallHours) {
-    overallHours.textContent = `${formatHours(progress.completedHours)}/${formatHours(progress.totalHours)} hrs`;
+    // Show completed hours + in-progress hours out of total hours
+    const combinedHours = formatHours(progress.completedHours + progress.inProgressHours);
+    overallHours.textContent = `${formatHours(progress.completedHours)}/${combinedHours}/${formatHours(progress.totalHours)} hrs`;
+    overallHours.setAttribute('title', `${formatHours(progress.completedHours)} completed, ${formatHours(progress.inProgressHours)} in progress, ${formatHours(progress.totalHours)} total`);
   }
   
   // Update department hours chart
@@ -126,6 +167,7 @@ function updateDepartmentHours(cards: TrelloCard[], boardData: TrelloBoardData) 
     color: string;
     totalHours: number;
     completedHours: number;
+    inProgressHours: number;
   }>();
   
   // Initialize with all departments
@@ -134,7 +176,8 @@ function updateDepartmentHours(cards: TrelloCard[], boardData: TrelloBoardData) 
       departmentMap.set(label.name, {
         color: label.color,
         totalHours: 0,
-        completedHours: 0
+        completedHours: 0,
+        inProgressHours: 0
       });
     }
   });
@@ -147,6 +190,7 @@ function updateDepartmentHours(cards: TrelloCard[], boardData: TrelloBoardData) 
     const hoursValue = typeof rawHours === 'string' ? Number(rawHours) : Number(rawHours);
     const hours = isFinite(hoursValue) && hoursValue >= 0 && hoursValue <= 10000 ? hoursValue : 0;
     const isComplete = isCardCompleted(card, boardData);
+    const isInProgress = !isComplete && isCardInProgress(card, boardData);
     
     card.labels.forEach(label => {
       if (label.name && departmentMap.has(label.name)) {
@@ -155,6 +199,8 @@ function updateDepartmentHours(cards: TrelloCard[], boardData: TrelloBoardData) 
         
         if (isComplete) {
           deptStats.completedHours = Number(deptStats.completedHours) + Number(hours);
+        } else if (isInProgress) {
+          deptStats.inProgressHours = Number(deptStats.inProgressHours) + Number(hours);
         }
       }
     });
@@ -172,22 +218,63 @@ function updateDepartmentHours(cards: TrelloCard[], boardData: TrelloBoardData) 
   
   // Create department hours display
   departmentsWithHours.forEach(([dept, stats]) => {
-    const percentage = stats.totalHours > 0 
+    // Calculate percentage for completed and in-progress
+    const completedPercentage = stats.totalHours > 0 
       ? Math.round((stats.completedHours / stats.totalHours) * 100) 
       : 0;
     
+    const inProgressPercentage = stats.totalHours > 0 
+      ? Math.round((stats.inProgressHours / stats.totalHours) * 100) 
+      : 0;
+    
+    // Calculate total percentage
+    const totalPercentage = completedPercentage + inProgressPercentage;
+    
     const departmentElement = document.createElement('div');
     departmentElement.className = 'mb-3';
+    
+    // Create HTML structure
     departmentElement.innerHTML = `
       <div class="flex justify-between mb-1">
         <span class="text-sm font-medium text-gray-700">${dept}</span>
-        <span class="text-sm font-medium text-gray-700">${formatHours(stats.completedHours)}/${formatHours(stats.totalHours)} hrs</span>
+        <span class="text-sm font-medium text-gray-700" title="${completedPercentage}% complete, ${inProgressPercentage}% in progress">
+          ${formatHours(stats.completedHours)}/${formatHours(stats.completedHours + stats.inProgressHours)}/${formatHours(stats.totalHours)} hrs
+        </span>
       </div>
-      <div class="w-full bg-gray-200 rounded-full h-2">
-        <div class="label-${stats.color} h-2 rounded-full progress-bar-animated" 
-             style="--target-width: ${Math.round(percentage)}%"></div>
-      </div>
+      <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden"></div>
     `;
+    
+    // Get the progress bar container
+    const progressBarContainer = departmentElement.querySelector('.bg-gray-200');
+    
+    // Create completed part
+    const completedPart = document.createElement('div');
+    completedPart.className = `label-${stats.color} h-2 progress-bar-animated`;
+    completedPart.style.width = `${completedPercentage}%`;
+    completedPart.style.setProperty('--target-width', `${completedPercentage}%`);
+    completedPart.style.float = 'left';
+    
+    // Create in-progress part
+    const inProgressPart = document.createElement('div');
+    inProgressPart.className = `label-${getFadedColorClass(stats.color)} h-2 progress-bar-animated`;
+    inProgressPart.style.width = `${inProgressPercentage}%`;
+    inProgressPart.style.setProperty('--target-width', `${inProgressPercentage}%`);
+    inProgressPart.style.float = 'left';
+    
+    // Apply rounded corners
+    if (completedPercentage > 0) {
+      completedPart.classList.add('rounded-l-full');
+    }
+    
+    if (inProgressPercentage > 0) {
+      inProgressPart.classList.add('rounded-r-full');
+    } else if (completedPercentage > 0) {
+      completedPart.classList.add('rounded-r-full');
+    }
+    
+    // Add parts to container
+    progressBarContainer?.appendChild(completedPart);
+    progressBarContainer?.appendChild(inProgressPart);
     
     departmentHoursContainer.appendChild(departmentElement);
   });
@@ -206,6 +293,7 @@ function updateSystemHours(cards: TrelloCard[], boardData: TrelloBoardData) {
   const systemMap = new Map<string, {
     totalHours: number;
     completedHours: number;
+    inProgressHours: number;
   }>();
   
   // Calculate hours for each system
@@ -219,11 +307,13 @@ function updateSystemHours(cards: TrelloCard[], boardData: TrelloBoardData) {
     const hoursValue = Number(rawHours);
     const hours = isFinite(hoursValue) && hoursValue >= 0 && hoursValue <= 10000 ? hoursValue : 0;
     const isComplete = isCardCompleted(card, boardData);
+    const isInProgress = !isComplete && isCardInProgress(card, boardData);
     
     if (!systemMap.has(system)) {
       systemMap.set(system, {
         totalHours: 0,
-        completedHours: 0
+        completedHours: 0,
+        inProgressHours: 0
       });
     }
     
@@ -232,6 +322,8 @@ function updateSystemHours(cards: TrelloCard[], boardData: TrelloBoardData) {
     
     if (isComplete) {
       systemStats.completedHours = Number(systemStats.completedHours) + Number(hours);
+    } else if (isInProgress) {
+      systemStats.inProgressHours = Number(systemStats.inProgressHours) + Number(hours);
     }
   });
   
@@ -247,22 +339,63 @@ function updateSystemHours(cards: TrelloCard[], boardData: TrelloBoardData) {
   
   // Create system hours display
   systemsWithHours.forEach(([system, stats]) => {
-    const percentage = stats.totalHours > 0 
+    // Calculate percentage for completed and in-progress
+    const completedPercentage = stats.totalHours > 0 
       ? Math.round((stats.completedHours / stats.totalHours) * 100) 
       : 0;
     
+    const inProgressPercentage = stats.totalHours > 0 
+      ? Math.round((stats.inProgressHours / stats.totalHours) * 100) 
+      : 0;
+    
+    // Calculate total percentage
+    const totalPercentage = completedPercentage + inProgressPercentage;
+    
     const systemElement = document.createElement('div');
     systemElement.className = 'mb-3';
+    
+    // Create HTML structure
     systemElement.innerHTML = `
       <div class="flex justify-between mb-1">
         <span class="text-sm font-medium text-gray-700">${system}</span>
-        <span class="text-sm font-medium text-gray-700">${formatHours(stats.completedHours)}/${formatHours(stats.totalHours)} hrs</span>
+        <span class="text-sm font-medium text-gray-700" title="${completedPercentage}% complete, ${inProgressPercentage}% in progress">
+          ${formatHours(stats.completedHours)}/${formatHours(stats.completedHours + stats.inProgressHours)}/${formatHours(stats.totalHours)} hrs
+        </span>
       </div>
-      <div class="w-full bg-gray-200 rounded-full h-2">
-        <div class="bg-blue-600 h-2 rounded-full progress-bar-animated" 
-             style="--target-width: ${Math.round(percentage)}%"></div>
-      </div>
+      <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden"></div>
     `;
+    
+    // Get the progress bar container
+    const progressBarContainer = systemElement.querySelector('.bg-gray-200');
+    
+    // Create completed part
+    const completedPart = document.createElement('div');
+    completedPart.className = `bg-blue-600 h-2 progress-bar-animated`;
+    completedPart.style.width = `${completedPercentage}%`;
+    completedPart.style.setProperty('--target-width', `${completedPercentage}%`);
+    completedPart.style.float = 'left';
+    
+    // Create in-progress part
+    const inProgressPart = document.createElement('div');
+    inProgressPart.className = `bg-blue-faded h-2 progress-bar-animated`;
+    inProgressPart.style.width = `${inProgressPercentage}%`;
+    inProgressPart.style.setProperty('--target-width', `${inProgressPercentage}%`);
+    inProgressPart.style.float = 'left';
+    
+    // Apply rounded corners
+    if (completedPercentage > 0) {
+      completedPart.classList.add('rounded-l-full');
+    }
+    
+    if (inProgressPercentage > 0) {
+      inProgressPart.classList.add('rounded-r-full');
+    } else if (completedPercentage > 0) {
+      completedPart.classList.add('rounded-r-full');
+    }
+    
+    // Add parts to container
+    progressBarContainer?.appendChild(completedPart);
+    progressBarContainer?.appendChild(inProgressPart);
     
     systemHoursContainer.appendChild(systemElement);
   });
@@ -309,22 +442,59 @@ export function updateDepartmentProgress(cards: TrelloCard[], boardData: TrelloB
   // Create department progress bars
   departmentStats.forEach(stats => {
     console.log(`Department ${stats.department} with color ${stats.color} and completion percentage ${stats.completionPercentage}`);
+    
+    // Calculate total progress (only completed percentage shown)
+    const completedPercentage = Math.round(stats.completionPercentage);
+    
     const departmentElement = document.createElement('div');
     departmentElement.className = 'mb-4';
+    
+    // Create basic HTML structure
     departmentElement.innerHTML = `
       <div class="flex justify-between mb-1">
         <span class="font-medium">${stats.department}</span>
-        <span class="text-sm font-medium">${Math.round(stats.completionPercentage)}% complete</span>
+        <span class="text-sm font-medium" title="${Math.round(stats.completionPercentage)}% complete, ${Math.round(stats.inProgressPercentage)}% in progress">
+          ${completedPercentage}% complete
+        </span>
       </div>
-      <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
-        <div class="label-${stats.color} h-2.5 rounded-full progress-bar-animated" 
-             style="--target-width: ${Math.round(stats.completionPercentage)}%"></div>
-      </div>
+      <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1 overflow-hidden"></div>
       <div class="flex justify-between text-xs text-gray-500">
-        <span>${stats.completedCards}/${stats.totalCards} tasks</span>
-        <span>${formatHours(stats.completedHours)}/${formatHours(stats.totalHours)} hours</span>
+        <span>${stats.completedCards}/${stats.totalCards} tasks (${stats.inProgressCards} in progress)</span>
+        <span>${formatHours(stats.completedHours)}/${formatHours(stats.completedHours + stats.inProgressHours)}/${formatHours(stats.totalHours)} hrs</span>
       </div>
     `;
+    
+    // Get the progress bar container
+    const progressBarContainer = departmentElement.querySelector('.bg-gray-200');
+    
+    // Create completed part
+    const completedPart = document.createElement('div');
+    completedPart.className = `label-${stats.color} h-2.5 progress-bar-animated`;
+    completedPart.style.width = `${Math.round(stats.completionPercentage)}%`;
+    completedPart.style.setProperty('--target-width', `${Math.round(stats.completionPercentage)}%`);
+    completedPart.style.float = 'left';
+    
+    // Create in-progress part
+    const inProgressPart = document.createElement('div');
+    inProgressPart.className = `label-${getFadedColorClass(stats.color)} h-2.5 progress-bar-animated`;
+    inProgressPart.style.width = `${Math.round(stats.inProgressPercentage)}%`;
+    inProgressPart.style.setProperty('--target-width', `${Math.round(stats.inProgressPercentage)}%`);
+    inProgressPart.style.float = 'left';
+    
+    // Apply rounded corners
+    if (stats.completionPercentage > 0) {
+      completedPart.classList.add('rounded-l-full');
+    }
+    
+    if (stats.inProgressPercentage > 0) {
+      inProgressPart.classList.add('rounded-r-full');
+    } else if (stats.completionPercentage > 0) {
+      completedPart.classList.add('rounded-r-full');
+    }
+    
+    // Add parts to container
+    progressBarContainer?.appendChild(completedPart);
+    progressBarContainer?.appendChild(inProgressPart);
     
     departmentProgressContainer.appendChild(departmentElement);
   });
@@ -376,22 +546,58 @@ export function updateSystemProgress(cards: TrelloCard[], boardData: TrelloBoard
   
   // Create system progress bars
   systemStats.forEach(stats => {
+    // Calculate progress (only completed percentage shown)
+    const completedPercentage = Math.round(stats.completionPercentage);
+    
     const systemElement = document.createElement('div');
     systemElement.className = 'mb-4';
+    
+    // Create basic HTML structure
     systemElement.innerHTML = `
       <div class="flex justify-between mb-1">
         <span class="font-medium">${stats.system}</span>
-        <span class="text-sm font-medium">${Math.round(stats.completionPercentage)}% complete</span>
+        <span class="text-sm font-medium" title="${Math.round(stats.completionPercentage)}% complete, ${Math.round(stats.inProgressPercentage)}% in progress">
+          ${completedPercentage}% complete
+        </span>
       </div>
-      <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
-        <div class="bg-blue-600 h-2.5 rounded-full progress-bar-animated" 
-             style="--target-width: ${Math.round(stats.completionPercentage)}%"></div>
-      </div>
+      <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1 overflow-hidden"></div>
       <div class="flex justify-between text-xs text-gray-500">
-        <span>${stats.completedCards}/${stats.totalCards} tasks</span>
-        <span>${formatHours(stats.completedHours)}/${formatHours(stats.totalHours)} hours</span>
+        <span>${stats.completedCards}/${stats.totalCards} tasks (${stats.inProgressCards} in progress)</span>
+        <span>${formatHours(stats.completedHours)}/${formatHours(stats.completedHours + stats.inProgressHours)}/${formatHours(stats.totalHours)} hrs</span>
       </div>
     `;
+    
+    // Get the progress bar container
+    const progressBarContainer = systemElement.querySelector('.bg-gray-200');
+    
+    // Create completed part
+    const completedPart = document.createElement('div');
+    completedPart.className = `bg-blue-600 h-2.5 progress-bar-animated`;
+    completedPart.style.width = `${Math.round(stats.completionPercentage)}%`;
+    completedPart.style.setProperty('--target-width', `${Math.round(stats.completionPercentage)}%`);
+    completedPart.style.float = 'left';
+    
+    // Create in-progress part
+    const inProgressPart = document.createElement('div');
+    inProgressPart.className = `bg-blue-faded h-2.5 progress-bar-animated`;
+    inProgressPart.style.width = `${Math.round(stats.inProgressPercentage)}%`;
+    inProgressPart.style.setProperty('--target-width', `${Math.round(stats.inProgressPercentage)}%`);
+    inProgressPart.style.float = 'left';
+    
+    // Apply rounded corners
+    if (stats.completionPercentage > 0) {
+      completedPart.classList.add('rounded-l-full');
+    }
+    
+    if (stats.inProgressPercentage > 0) {
+      inProgressPart.classList.add('rounded-r-full');
+    } else if (stats.completionPercentage > 0) {
+      completedPart.classList.add('rounded-r-full');
+    }
+    
+    // Add parts to container
+    progressBarContainer?.appendChild(completedPart);
+    progressBarContainer?.appendChild(inProgressPart);
     
     systemProgressContainer.appendChild(systemElement);
   });
@@ -456,23 +662,59 @@ export function updateDetailedBreakdown(cards: TrelloCard[], boardData: TrelloBo
       
       const progress = calculateProgress(systemCards, boardData);
       
+      // Calculate completed percentage (not total progress)
+      const completedPercentage = Math.round(progress.completionPercentage);
+      
       // Create system progress within department
       const systemElement = document.createElement('div');
       systemElement.className = 'ml-4 mb-3';
+      
+      // Create HTML structure
       systemElement.innerHTML = `
         <div class="flex justify-between mb-1">
           <span class="font-medium">${system}</span>
-          <span class="text-sm font-medium">${Math.round(progress.completionPercentage)}% complete</span>
+          <span class="text-sm font-medium" title="${Math.round(progress.completionPercentage)}% complete, ${Math.round(progress.inProgressPercentage)}% in progress">
+            ${completedPercentage}% complete
+          </span>
         </div>
-        <div class="w-full bg-gray-200 rounded-full h-2 mb-1">
-          <div class="label-${departmentColor} h-2 rounded-full progress-bar-animated" 
-               style="--target-width: ${Math.round(progress.completionPercentage)}%"></div>
-        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2 mb-1 overflow-hidden"></div>
         <div class="flex justify-between text-xs text-gray-500 mb-2">
-          <span>${progress.completedCards}/${progress.totalCards} tasks</span>
-          <span>${formatHours(progress.completedHours)}/${formatHours(progress.totalHours)} hours</span>
+          <span>${progress.completedCards}/${progress.totalCards} tasks (${progress.inProgressCards} in progress)</span>
+          <span>${formatHours(progress.completedHours)}/${formatHours(progress.completedHours + progress.inProgressHours)}/${formatHours(progress.totalHours)} hrs</span>
         </div>
       `;
+      
+      // Get the progress bar container
+      const progressBarContainer = systemElement.querySelector('.bg-gray-200');
+      
+      // Create completed part
+      const completedPart = document.createElement('div');
+      completedPart.className = `label-${departmentColor} h-2 progress-bar-animated`;
+      completedPart.style.width = `${Math.round(progress.completionPercentage)}%`;
+      completedPart.style.setProperty('--target-width', `${Math.round(progress.completionPercentage)}%`);
+      completedPart.style.float = 'left';
+      
+      // Create in-progress part
+      const inProgressPart = document.createElement('div');
+      inProgressPart.className = `label-${getFadedColorClass(departmentColor)} h-2 progress-bar-animated`;
+      inProgressPart.style.width = `${Math.round(progress.inProgressPercentage)}%`;
+      inProgressPart.style.setProperty('--target-width', `${Math.round(progress.inProgressPercentage)}%`);
+      inProgressPart.style.float = 'left';
+      
+      // Apply rounded corners
+      if (progress.completionPercentage > 0) {
+        completedPart.classList.add('rounded-l-full');
+      }
+      
+      if (progress.inProgressPercentage > 0) {
+        inProgressPart.classList.add('rounded-r-full');
+      } else if (progress.completionPercentage > 0) {
+        completedPart.classList.add('rounded-r-full');
+      }
+      
+      // Add parts to container
+      progressBarContainer?.appendChild(completedPart);
+      progressBarContainer?.appendChild(inProgressPart);
       
       departmentSection.appendChild(systemElement);
     });
