@@ -6,6 +6,19 @@ import { TrelloCard, TrelloBoardData, ProgressStats } from './typeAdapter';
 const completedListNames = ['Done', 'Completed', 'Finished'];
 
 /**
+ * Checks if a card is in progress (not completed but in an active state)
+ */
+export function isCardInProgress(card: TrelloCard, boardData: TrelloBoardData): boolean {
+  const cardList = boardData.lists.find(list => list.id === card.listId);
+  if (!cardList) return false;
+  
+  const listNameLower = cardList.name.toLowerCase();
+  return listNameLower.includes('progress') || 
+         listNameLower.includes('review') || 
+         listNameLower.includes('doing');
+}
+
+/**
  * Checks if a card is considered completed based on its list
  */
 export function isCardCompleted(card: TrelloCard, boardData: TrelloBoardData): boolean {
@@ -24,9 +37,11 @@ export function isCardCompleted(card: TrelloCard, boardData: TrelloBoardData): b
 export function calculateProgress(cards: TrelloCard[], boardData: TrelloBoardData): ProgressStats {
   const totalCards = cards.length;
   const completedCards = cards.filter(card => isCardCompleted(card, boardData)).length;
+  const inProgressCards = cards.filter(card => isCardInProgress(card, boardData)).length;
   
   let totalHours: number = 0;
   let completedHours: number = 0;
+  let inProgressHours: number = 0;
   
   cards.forEach(card => {
     // Explicitly parse and convert hours to number
@@ -40,6 +55,8 @@ export function calculateProgress(cards: TrelloCard[], boardData: TrelloBoardDat
       
       if (isCardCompleted(card, boardData)) {
         completedHours = Number(completedHours) + Number(hours);
+      } else if (isCardInProgress(card, boardData)) {
+        inProgressHours = Number(inProgressHours) + Number(hours);
       }
     }
   });
@@ -48,12 +65,19 @@ export function calculateProgress(cards: TrelloCard[], boardData: TrelloBoardDat
     ? Math.round((completedCards / totalCards) * 100) 
     : 0;
   
+  const inProgressPercentage = totalCards > 0 
+    ? Math.round((inProgressCards / totalCards) * 100) 
+    : 0;
+  
   return {
     totalCards,
     completedCards,
+    inProgressCards,
     totalHours,
     completedHours,
-    completionPercentage
+    inProgressHours,
+    completionPercentage,
+    inProgressPercentage
   };
 }
 
