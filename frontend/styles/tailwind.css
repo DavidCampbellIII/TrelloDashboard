@@ -1,0 +1,39 @@
+/* Custom CSS additions */
+
+/* Progress bar animation */
+@keyframes progressFill {
+  0% { width: 0; }
+  100% { width: var(--target-width); }
+}
+
+.progress-bar-animated {
+  animation: progressFill 1s ease-out forwards;
+}
+
+/* Custom color classes for Trello labels */
+.label-red { background-color: #eb5a46; }
+.label-orange { background-color: #ff9f1a; }
+.label-yellow { background-color: #f2d600; }
+.label-green { background-color: #61bd4f; }
+.label-blue { background-color: #0079bf; }
+.label-purple { background-color: #c377e0; }
+.label-pink { background-color: #ff78cb; }
+.label-sky { background-color: #00c2e0; }
+.label-lime { background-color: #51e898; }
+.label-black { background-color: #344563; }
+
+/* Hover effects for interactive elements */
+.hover-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Better focus styling for accessibility */
+button:focus, select:focus, a:focus {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+}

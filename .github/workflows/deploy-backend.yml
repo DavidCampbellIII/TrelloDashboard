@@ -1,0 +1,48 @@
+name: Deploy Backend Functions
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/functions/**'
+      - '.github/workflows/deploy-backend.yml'
+
+jobs:
+  deploy-functions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+      
+      - name: Install Dependencies
+        run: |
+          cd backend/functions
+          npm install
+      
+      - name: Create .env file
+        run: |
+          cd backend/functions
+          echo "TRELLO_API_KEY=${{ secrets.TRELLO_API_KEY }}" > .env
+          echo "TRELLO_SECRET=${{ secrets.TRELLO_SECRET }}" >> .env
+      
+      - name: Lint
+        run: |
+          cd backend/functions
+          npm run lint
+      
+      - name: Build
+        run: |
+          cd backend/functions
+          npm run build
+      
+      - name: Deploy to Firebase
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only functions
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          PROJECT_PATH: 'backend/functions'
