@@ -308,6 +308,7 @@ export function updateDepartmentProgress(cards: TrelloCard[], boardData: TrelloB
   
   // Create department progress bars
   departmentStats.forEach(stats => {
+    console.log(`Department ${stats.department} with color ${stats.color} and completion percentage ${stats.completionPercentage}`);
     const departmentElement = document.createElement('div');
     departmentElement.className = 'mb-4';
     departmentElement.innerHTML = `
