@@ -3,6 +3,36 @@ import admin from "firebase-admin";
 import axios from "axios";
 import dotenv from "dotenv";
 
+// Constants for determining card status
+const COMPLETED_LIST_PATTERNS = [
+  'done',
+  'complete',
+  'finished'
+];
+
+const IN_PROGRESS_LIST_PATTERNS = [
+  'progress',
+  'doing',
+  'review'
+];
+
+/**
+ * Determines card status based on list name
+ * @param listName The name of the list containing the card
+ * @returns The status of the card
+ */
+function determineCardStatus(listName: string): "complete" | "in-progress" | "not-started" {
+  const nameLower = listName.toLowerCase();
+  
+  if (COMPLETED_LIST_PATTERNS.some(pattern => nameLower.includes(pattern))) {
+    return 'complete';
+  } else if (IN_PROGRESS_LIST_PATTERNS.some(pattern => nameLower.includes(pattern))) {
+    return 'in-progress';
+  }
+  
+  return 'not-started';
+}
+
 // Load environment variables from .env file
 dotenv.config();
 
@@ -192,17 +222,7 @@ export const fetchTrelloBoard = functions.https.onCall(async (data, context) => 
           const list = lists.find((l) => l.id === card.idList);
           
           if (list) {
-            const listNameLower = list.name.toLowerCase();
-            if (listNameLower.includes("done") ||
-                listNameLower.includes("complete")) {
-              status = "complete";
-            } else if (
-              listNameLower.includes("progress") || 
-              listNameLower.includes("doing") || 
-              listNameLower.includes("review")
-            ) {
-              status = "in-progress";
-            }
+            status = determineCardStatus(list.name);
           }
 
           // Extract custom field values
