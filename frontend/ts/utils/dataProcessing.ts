@@ -1,9 +1,7 @@
 // Data processing utilities for Trello Dashboard Visualizer
 
 import { TrelloCard, TrelloBoardData, ProgressStats } from './typeAdapter';
-
-// List of names indicating a completed status
-const completedListNames = ['Done', 'Completed', 'Finished'];
+import { determineCardStatus, COMPLETED_LIST_PATTERNS, IN_PROGRESS_LIST_PATTERNS } from '../constants/status';
 
 /**
  * Checks if a card is in progress (not completed but in an active state)
@@ -12,10 +10,7 @@ export function isCardInProgress(card: TrelloCard, boardData: TrelloBoardData): 
   const cardList = boardData.lists.find(list => list.id === card.listId);
   if (!cardList) return false;
   
-  const listNameLower = cardList.name.toLowerCase();
-  return listNameLower.includes('progress') || 
-         listNameLower.includes('review') || 
-         listNameLower.includes('doing');
+  return determineCardStatus(cardList.name) === 'in-progress';
 }
 
 /**
@@ -25,10 +20,7 @@ export function isCardCompleted(card: TrelloCard, boardData: TrelloBoardData): b
   const cardList = boardData.lists.find(list => list.id === card.listId);
   if (!cardList) return false;
   
-  const listNameLower = cardList.name.toLowerCase();
-  return listNameLower.includes('done') || 
-         listNameLower.includes('complete') || 
-         listNameLower.includes('finished');
+  return determineCardStatus(cardList.name) === 'complete';
 }
 
 /**

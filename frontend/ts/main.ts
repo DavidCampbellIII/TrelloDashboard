@@ -6,6 +6,7 @@ import { SanitizedBoardData, fetchBoardData } from './api/trello';
 
 import { filterCards, clearOptionsKeepingAll } from './utils/dataProcessing';
 import { convertToTrelloBoardData, TrelloBoardData } from './utils/typeAdapter';
+import { handleApiError, formatErrorForDisplay, ErrorType } from './utils/errorHandler';
 import {
   populateFilters,
   updateOverallProgress,
@@ -24,11 +25,21 @@ let adaptedBoardData: TrelloBoardData | null = null;
 let selectedDepartment = 'all';
 let selectedSystem = 'all';
 
-// DOM element references
-const departmentFilter = document.getElementById('department-filter') as HTMLSelectElement;
-const systemFilter = document.getElementById('system-filter') as HTMLSelectElement;
+// Type-safe element selector
+function getElementSafe<T extends HTMLElement>(id: string): T {
+  const element = document.getElementById(id) as T;
+  if (!element) {
+    throw new Error(`Element not found: ${id}`);
+  }
+  return element;
+}
 
-  /**
+// DOM element references with type safety
+const departmentFilter = getElementSafe<HTMLSelectElement>('department-filter');
+const systemFilter = getElementSafe<HTMLSelectElement>('system-filter');
+const refreshButton = getElementSafe<HTMLButtonElement>('refresh-data');
+
+/**
  * Initialize the dashboard
  */
 async function initDashboard() {
@@ -54,7 +65,10 @@ async function initDashboard() {
     
     showLoading(false);
   } catch (error) {
-    showError(`Failed to initialize dashboard: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    // Handle error with enhanced error processing
+    const appError = handleApiError(error);
+    showError(formatErrorForDisplay(appError));
+    console.error('Dashboard initialization error:', appError);
     showLoading(false);
   }
 }
@@ -80,24 +94,58 @@ function updateDashboard() {
  */
 function setupEventListeners() {
   // Add filter change event listeners
-  if (departmentFilter) {
-    departmentFilter.addEventListener('change', (e) => {
-      selectedDepartment = (e.target as HTMLSelectElement).value;
-      updateDashboard();
-    });
-  }
+  departmentFilter.addEventListener('change', (e) => {
+    selectedDepartment = (e.target as HTMLSelectElement).value;
+    updateDashboard();
+  });
   
-  if (systemFilter) {
-    systemFilter.addEventListener('change', (e) => {
-      selectedSystem = (e.target as HTMLSelectElement).value;
-      updateDashboard();
-    });
-  }
+  systemFilter.addEventListener('change', (e) => {
+    selectedSystem = (e.target as HTMLSelectElement).value;
+    updateDashboard();
+  });
+  
+  // Add refresh button event listener
+  refreshButton.addEventListener('click', async () => {
+    try {
+      // Show loading spinner during refresh
+      showLoading(true);
+      refreshButton.disabled = true;
+      refreshButton.classList.add('opacity-50');
+      
+      // Fetch fresh data from the API
+      boardData = await fetchBoardData();
+      
+      if (boardData) {
+        // Convert the API data to the format expected by the frontend components
+        adaptedBoardData = convertToTrelloBoardData(boardData);
+        
+        // Update filters with potentially new departments/systems
+        populateFilters(adaptedBoardData, departmentFilter, systemFilter);
+        
+        // Update dashboard with new data
+        updateDashboard();
+        
+        // Update timestamp
+        updateTimestamp();
+      }
+      
+      // Hide loading spinner
+      showLoading(false);
+      refreshButton.disabled = false;
+      refreshButton.classList.remove('opacity-50');
+    } catch (error) {
+      // Handle error with enhanced error processing
+      const appError = handleApiError(error);
+      showError(formatErrorForDisplay(appError));
+      console.error('Dashboard refresh error:', appError);
+      showLoading(false);
+      refreshButton.disabled = false;
+      refreshButton.classList.remove('opacity-50');
+    }
+  });
   
   // Setup error modal close button
   setupErrorModalClose();
-  
-  // No test buttons needed in production
 }
 
 /**
