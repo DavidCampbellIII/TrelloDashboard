@@ -91,6 +91,38 @@ async function build() {
       });
     }
     
+    // Check if there are other assets that need to be copied (images, fonts, etc.)
+    const assetsDir = path.resolve(__dirname, 'frontend', 'assets');
+    const distAssetsDir = path.resolve(__dirname, 'frontend', 'dist', 'assets');
+    
+    if (fs.existsSync(assetsDir)) {
+      if (!fs.existsSync(distAssetsDir)) {
+        fs.mkdirSync(distAssetsDir, { recursive: true });
+      }
+      
+      // Copy all asset files (recursive)
+      const copyAssets = (src, dest) => {
+        const entries = fs.readdirSync(src, { withFileTypes: true });
+        
+        for (const entry of entries) {
+          const srcPath = path.resolve(src, entry.name);
+          const destPath = path.resolve(dest, entry.name);
+          
+          if (entry.isDirectory()) {
+            if (!fs.existsSync(destPath)) {
+              fs.mkdirSync(destPath, { recursive: true });
+            }
+            copyAssets(srcPath, destPath);
+          } else {
+            fs.copyFileSync(srcPath, destPath);
+            console.log(`Copied asset: ${entry.name}`);
+          }
+        }
+      };
+      
+      copyAssets(assetsDir, distAssetsDir);
+    }
+    
     console.log('Build complete!');
     
     // Show any warnings
