@@ -144,3 +144,27 @@ select:focus, input:focus {
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
 }
+
+/* Collapsible sections */
+.section-toggle {
+  transition: transform 0.2s ease;
+}
+
+.section-toggle:hover {
+  transform: scale(1.1);
+}
+
+/* Section content transition */
+#department-progress-container,
+#system-progress-container,
+#detailed-breakdown-container {
+  transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
+  overflow: hidden;
+}
+
+#department-progress-container.hidden,
+#system-progress-container.hidden,
+#detailed-breakdown-container.hidden {
+  max-height: 0;
+  opacity: 0;
+}
