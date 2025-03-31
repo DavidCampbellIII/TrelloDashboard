@@ -1,0 +1,170 @@
+/* Custom CSS additions - Dark Mode Only */
+
+/* Dark mode colors */
+:root {
+  --bg-primary: #1a202c; /* gray-900 */
+  --bg-secondary: #2d3748; /* gray-800 */
+  --bg-tertiary: #4a5568; /* gray-700 */
+  --text-primary: #f7fafc; /* gray-100 */
+  --text-secondary: #cbd5e0; /* gray-400 */
+  --accent: #3182ce; /* blue-600 */
+  --accent-light: #63b3ed; /* blue-400 */
+  --border: #4a5568; /* gray-700 */
+  --error: #f56565; /* red-500 */
+  --success: #48bb78; /* green-500 */
+}
+
+/* Progress bar animation */
+@keyframes progressFill {
+  0% { width: 0; }
+  100% { width: var(--target-width); }
+}
+
+.progress-bar-animated {
+  animation: progressFill 1s ease-out forwards;
+}
+
+/* Custom color classes for Trello labels */
+/* Base colors */
+.label-red { background-color: #eb5a46; }
+.label-orange { background-color: #ff9f1a; }
+.label-yellow { background-color: #f2d600; }
+.label-green { background-color: #61bd4f; }
+.label-blue { background-color: #0079bf; }
+.label-purple { background-color: #c377e0; }
+.label-pink { background-color: #ff78cb; }
+.label-sky { background-color: #00c2e0; }
+.label-lime { background-color: #51e898; }
+.label-black { background-color: #344563; }
+
+/* Light variants (subtle/darker in Trello's scheme) */
+.label-red_light { background-color: #b04632; }
+.label-orange_light { background-color: #d68000; }
+.label-yellow_light { background-color: #d9b51c; }
+.label-green_light { background-color: #4a913c; }
+.label-blue_light { background-color: #055a8c; }
+.label-purple_light { background-color: #a15da6; }
+.label-pink_light { background-color: #e362b5; }
+.label-sky_light { background-color: #0098b7; }
+.label-lime_light { background-color: #42b883; }
+.label-black_light { background-color: #292e3a; }
+
+/* Faded variants for in-progress indicators */
+.label-red-faded { background-color: rgba(235, 90, 70, 0.5); }
+.label-orange-faded { background-color: rgba(255, 159, 26, 0.5); }
+.label-yellow-faded { background-color: rgba(242, 214, 0, 0.5); }
+.label-green-faded { background-color: rgba(97, 189, 79, 0.5); }
+.label-blue-faded { background-color: rgba(0, 121, 191, 0.5); }
+.label-purple-faded { background-color: rgba(195, 119, 224, 0.5); }
+.label-pink-faded { background-color: rgba(255, 120, 203, 0.5); }
+.label-sky-faded { background-color: rgba(0, 194, 224, 0.5); }
+.label-lime-faded { background-color: rgba(81, 232, 152, 0.5); }
+.label-black-faded { background-color: rgba(52, 69, 99, 0.5); }
+.bg-blue-faded { background-color: rgba(59, 130, 246, 0.5); }
+
+/* Faded light variants */
+.label-red_light-faded { background-color: rgba(176, 70, 50, 0.5); }
+.label-orange_light-faded { background-color: rgba(214, 128, 0, 0.5); }
+.label-yellow_light-faded { background-color: rgba(217, 181, 28, 0.5); }
+.label-green_light-faded { background-color: rgba(74, 145, 60, 0.5); }
+.label-blue_light-faded { background-color: rgba(5, 90, 140, 0.5); }
+.label-purple_light-faded { background-color: rgba(161, 93, 166, 0.5); }
+.label-pink_light-faded { background-color: rgba(227, 98, 181, 0.5); }
+.label-sky_light-faded { background-color: rgba(0, 152, 183, 0.5); }
+.label-lime_light-faded { background-color: rgba(66, 184, 131, 0.5); }
+.label-black_light-faded { background-color: rgba(41, 46, 58, 0.5); }
+
+/* Dark variants (bold/brighter in Trello's scheme) */
+.label-red_dark { background-color: #f5a397; }
+.label-orange_dark { background-color: #ffbc5c; }
+.label-yellow_dark { background-color: #f5e056; }
+.label-green_dark { background-color: #8ed082; }
+.label-blue_dark { background-color: #5eaadf; }
+.label-purple_dark { background-color: #d9a6eb; }
+.label-pink_dark { background-color: #ff9fd8; }
+.label-sky_dark { background-color: #67d7eb; }
+.label-lime_dark { background-color: #85eeb2; }
+.label-black_dark { background-color: #6b798c; }
+
+/* Faded dark variants */
+.label-red_dark-faded { background-color: rgba(245, 163, 151, 0.5); }
+.label-orange_dark-faded { background-color: rgba(255, 188, 92, 0.5); }
+.label-yellow_dark-faded { background-color: rgba(245, 224, 86, 0.5); }
+.label-green_dark-faded { background-color: rgba(142, 208, 130, 0.5); }
+.label-blue_dark-faded { background-color: rgba(94, 170, 223, 0.5); }
+.label-purple_dark-faded { background-color: rgba(217, 166, 235, 0.5); }
+.label-pink_dark-faded { background-color: rgba(255, 159, 216, 0.5); }
+.label-sky_dark-faded { background-color: rgba(103, 215, 235, 0.5); }
+.label-lime_dark-faded { background-color: rgba(133, 238, 178, 0.5); }
+.label-black_dark-faded { background-color: rgba(107, 121, 140, 0.5); }
+
+/* Hover effects for interactive elements */
+.hover-card {
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.hover-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+  border-color: #3182ce; /* blue-600 */
+}
+
+/* Better focus styling for accessibility */
+button:focus, select:focus, a:focus {
+  outline: 2px solid rgba(79, 170, 250, 0.7);
+  outline-offset: 2px;
+}
+
+/* Dark mode scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #2d3748; /* gray-800 */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4a5568; /* gray-700 */
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3182ce; /* blue-600 */
+}
+
+/* Form elements styling */
+select, input {
+  background-color: #374151; /* gray-700 */
+  border-color: #4b5563; /* gray-600 */
+  color: #f9fafb; /* gray-50 */
+}
+
+select:focus, input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+/* Collapsible sections */
+.section-toggle {
+  transition: transform 0.2s ease;
+}
+
+.section-toggle:hover {
+  transform: scale(1.1);
+}
+
+/* Section content transition */
+#department-progress-container,
+#system-progress-container,
+#detailed-breakdown-container {
+  transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
+  overflow: hidden;
+}
+
+#department-progress-container.hidden,
+#system-progress-container.hidden,
+#detailed-breakdown-container.hidden {
+  max-height: 0;
+  opacity: 0;
+}

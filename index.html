@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a202c" id="theme-color-meta">
+    <title>Trello Dashboard Visualizer</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMzE4MmNlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgY2xhc3M9ImZlYXRoZXIgZmVhdGhlci1jaGFydCI+PHBvbHlnb24gcG9pbnRzPSIyMy4yNyA5Ljk1IDE1LjczIDkuOTUgMTUuNzMgMi41IDE4LjczIDIuNSAyMy4yNyA3LjA0Ij48L3BvbHlnb24+PHBhdGggZD0iTTIyIDE2LjkydjQuNjFjMCAuNC0uMTYuNzgtLjQ0IDEuMDZBMS41IDEuNSAwIDAgMSAyMC41IDIzSDIuNWMtLjYgMC0xLjEtLjIyLTEuNS0uNjJBMi0yIDAgMCAxIC41IDE5LjYxVjRhMiAyIDAgMCAxIDItMmg3LjQ2TDEzIDE2YzAgLjMyLjA3LjYzLjE4LjkxLjEyLjI5LjI5LjU1LjUuNzcuMTcuMTkuMzguMzQuNjEuNDZhMS45NiAxLjk2IDAgMCAwIDEuMjIuMTlsNC4xNC0xLjAzYy4zNi0uMS42OC0uNDMuNzgtLjgyLjExLS4zOS0uMDgtLjk0LS40Mi0xLjA0TDEyIDE3Vjgu43M2w5IDE2LjU0LjA0LjA1YS43NS43NSAwIDAgMCAuOTcuMzQuNzYuNzYgMCAwIDAgLjM1LS45OEwxOCA5LjA4SC4wOFYyNCIvPjwvc3ZnPg==">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/tailwind.css">
+    <!-- Fallback for CSS if the above path doesn't work -->
+    <link rel="stylesheet" href="tailwind.css">
+    
+    <!-- No need for Firebase script tags here as we're using the modular API via npm -->
+</head>
+<body class="font-sans bg-gray-900 text-gray-200">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header Section -->
+        <header class="mb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-white">Trello Dashboard Visualizer</h1>
+                    <p class="text-gray-400">Project progress at a glance</p>
+                </div>
+                <button id="refresh-data" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Refresh Data
+                </button>
+            </div>
+        </header>
+
+        <!-- Filters Section -->
+        <div class="bg-gray-800 rounded-lg shadow-md p-4 mb-6 border border-gray-700 hover-card">
+            <h2 class="text-xl font-semibold mb-4">Filters</h2>
+            <div class="flex flex-wrap gap-4">
+                <div class="w-full md:w-auto">
+                    <label for="department-filter" class="block text-sm font-medium text-gray-400 mb-1">Department</label>
+                    <select id="department-filter" class="block w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="all">All Departments</option>
+                        <!-- Dynamically populated from Trello labels -->
+                    </select>
+                </div>
+                <div class="w-full md:w-auto">
+                    <label for="system-filter" class="block text-sm font-medium text-gray-400 mb-1">System</label>
+                    <select id="system-filter" class="block w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="all">All Systems</option>
+                        <!-- Dynamically populated from Trello custom fields -->
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Overall Progress Card -->
+            <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700 hover-card">
+                <h3 class="text-lg font-semibold mb-4">Overall Progress</h3>
+                <div class="mb-2 flex justify-between">
+                    <span class="text-sm font-medium text-gray-400">Completion:</span>
+                    <span id="overall-completion-percent" class="text-sm font-semibold text-blue-400">0%</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2.5 mb-4">
+                    <div id="overall-progress-bar" class="bg-blue-500 h-2.5 rounded-full" style="width: 0%"></div>
+                </div>
+                <div class="mb-2 flex justify-between">
+                    <span class="text-sm font-medium text-gray-400">Estimated Hours:</span>
+                    <span id="overall-hours" class="text-sm font-semibold text-blue-400">0/0 hrs</span>
+                </div>
+            </div>
+
+            <!-- Hours by Department Card -->
+            <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700 hover-card">
+                <h3 class="text-lg font-semibold mb-4">Hours by Department</h3>
+                <div id="department-hours-container">
+                    <!-- Dynamically populated -->
+                    <div class="text-sm text-gray-400 italic">No data available</div>
+                </div>
+            </div>
+
+            <!-- Hours by System Card -->
+            <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700 hover-card">
+                <h3 class="text-lg font-semibold mb-4">Hours by System</h3>
+                <div id="system-hours-container">
+                    <!-- Dynamically populated -->
+                    <div class="text-sm text-gray-400 italic">No data available</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Department Progress Section -->
+        <div class="bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-700 hover-card">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Department Progress</h2>
+                <button class="section-toggle text-gray-400 hover:text-white focus:outline-none" aria-expanded="true" aria-controls="department-progress-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 chevron-up" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 chevron-down hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+            </div>
+            <div id="department-progress-container" class="space-y-4">
+                <!-- Dynamically populated with department progress bars -->
+                <div class="text-sm text-gray-400 italic">No data available</div>
+            </div>
+        </div>
+
+        <!-- System Progress Section -->
+        <div class="bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-700 hover-card">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">System Progress</h2>
+                <button class="section-toggle text-gray-400 hover:text-white focus:outline-none" aria-expanded="true" aria-controls="system-progress-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 chevron-up" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 chevron-down hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+            </div>
+            <div id="system-progress-container" class="space-y-4">
+                <!-- Dynamically populated with system progress bars -->
+                <div class="text-sm text-gray-400 italic">No data available</div>
+            </div>
+        </div>
+
+        <!-- Department + System Breakdown -->
+        <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700 hover-card">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Detailed Breakdown</h2>
+                <button class="section-toggle text-gray-400 hover:text-white focus:outline-none" aria-expanded="true" aria-controls="detailed-breakdown-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 chevron-up" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 chevron-down hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+            </div>
+            <div id="detailed-breakdown-container" class="space-y-6">
+                <!-- Dynamically populated -->
+                <div class="text-sm text-gray-400 italic">No data available</div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-950 text-gray-400 p-4 mt-12 border-t border-gray-800">
+        <div class="container mx-auto">
+            <p class="text-center text-sm">Trello Dashboard Visualizer - Data refreshed: <span id="last-updated">Never</span></p>
+        </div>
+    </footer>
+
+    <!-- Modal for Error Messages -->
+    <div id="error-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50">
+        <div class="bg-gray-800 border border-red-800 rounded-lg p-6 max-w-md w-full">
+            <h3 class="text-lg font-semibold text-red-400 mb-2">Error</h3>
+            <p id="error-message" class="text-gray-400 mb-4">Something went wrong.</p>
+            <button id="close-error" class="bg-red-700 text-white px-4 py-2 rounded hover:bg-red-800 focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">Close</button>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-40">
+        <div class="bg-gray-800 border border-gray-700 p-5 rounded-lg flex flex-col items-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-400 mb-3"></div>
+            <p class="text-gray-400">Loading data...</p>
+        </div>
+    </div>
+
+    <script src="bundle.js"></script>
+</body>
+</html>
