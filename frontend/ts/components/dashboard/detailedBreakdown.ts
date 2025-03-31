@@ -48,6 +48,9 @@ export function updateDetailedBreakdown(cards: TrelloCard[], boardData: TrelloBo
     
     if (departmentCards.length === 0) return;
     
+    // Calculate department-level progress statistics
+    const departmentProgress = calculateProgress(departmentCards, boardData);
+    
     // Get department color
     const departmentLabel = boardData.labels.find(label => label.name === department);
     const departmentColor = departmentLabel ? departmentLabel.color : 'gray';
@@ -55,25 +58,72 @@ export function updateDetailedBreakdown(cards: TrelloCard[], boardData: TrelloBo
     // Create department section
     const departmentSection = document.createElement('div');
     departmentSection.className = 'mb-6';
+    
+    // Create department heading with task counts
+    const completedTasks = departmentProgress.completedCards;
+    const inProgressTasks = departmentProgress.inProgressCards;
+    const notStartedTasks = departmentProgress.totalCards - completedTasks - inProgressTasks;
+    
     departmentSection.innerHTML = `
-      <h3 class="text-lg font-medium mb-3">${department}</h3>
+      <div class="flex flex-wrap justify-between items-center mb-3">
+        <h3 class="text-lg font-medium">${department}</h3>
+        <div class="text-sm text-gray-400 flex flex-wrap gap-1 mt-1 sm:mt-0">
+          <span class="px-2 py-1 bg-green-900 bg-opacity-30 rounded-md" title="Completed tasks">
+            ${completedTasks} done
+          </span>
+          <span class="px-2 py-1 bg-yellow-700 bg-opacity-30 rounded-md" title="Tasks in progress">
+            ${inProgressTasks} in progress
+          </span>
+          <span class="px-2 py-1 bg-gray-700 bg-opacity-30 rounded-md" title="Tasks not started">
+            ${notStartedTasks} not started
+          </span>
+        </div>
+      </div>
     `;
     
+    // Add department-level progress bar
+    const departmentProgressBar = createProgressBar({
+      completedPercentage: departmentProgress.completionPercentage,
+      inProgressPercentage: departmentProgress.inProgressPercentage,
+      completedColorClass: `label-${departmentColor}`,
+      inProgressColorClass: `label-${getFadedColorClass(departmentColor)}`,
+      height: '3'
+    });
+    
+    // Create department summary with hours information
+    const departmentSummary = document.createElement('div');
+    departmentSummary.className = 'flex justify-between text-xs text-gray-400 mb-4';
+    departmentSummary.innerHTML = `
+      <span>${formatHours(departmentProgress.completedHours)}/${formatHours(departmentProgress.totalHours)} hrs (${Math.round(departmentProgress.completionPercentage)}% complete)</span>
+    `;
+    
+    // Add the progress bar and summary to the department section
+    departmentSection.appendChild(departmentProgressBar);
+    departmentSection.appendChild(departmentSummary);
+    
     // Create a sub-section for each system
-    systems.forEach(system => {
+    const filteredSystems = Array.from(systems).filter(system => {
+      const systemCards = departmentCards.filter(card => 
+        card.customFields.system === system
+      );
+      return systemCards.length > 0;
+    });
+    
+    // Process each system
+    filteredSystems.forEach((system, index) => {
       const systemCards = departmentCards.filter(card => 
         card.customFields.system === system
       );
       
-      if (systemCards.length === 0) return;
-      
       const progress = calculateProgress(systemCards, boardData);
       
-      // Create system element
+      // Create system element - remove border for the last system in each department
+      const isLastSystem = index === filteredSystems.length - 1;
       const systemElement = createSystemElementForDepartment(
         system, 
         progress, 
-        departmentColor
+        departmentColor,
+        isLastSystem
       );
       
       departmentSection.appendChild(systemElement);
@@ -98,10 +148,13 @@ function createSystemElementForDepartment(
     inProgressHours: number;
     totalHours: number;
   }, 
-  departmentColor: string
+  departmentColor: string,
+  isLastSystem: boolean = false
 ): HTMLElement {
   const systemElement = document.createElement('div');
-  systemElement.className = 'ml-4 mb-3';
+  systemElement.className = isLastSystem 
+    ? 'ml-4 mb-2' 
+    : 'ml-4 mb-4 pb-2 border-b border-gray-800';
   
   // Calculate completed percentage
   const completedPercentage = Math.round(progress.completionPercentage);
