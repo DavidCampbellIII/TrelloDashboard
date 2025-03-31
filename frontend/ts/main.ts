@@ -7,6 +7,7 @@ import { SanitizedBoardData, fetchBoardData } from './api/trello';
 import { filterCards, clearOptionsKeepingAll } from './utils/dataProcessing';
 import { convertToTrelloBoardData, TrelloBoardData } from './utils/typeAdapter';
 import { handleApiError, formatErrorForDisplay, ErrorType } from './utils/errorHandler';
+import { initSectionToggles } from './utils/sectionToggle';
 import {
   populateFilters,
   updateOverallProgress,
@@ -146,6 +147,9 @@ function setupEventListeners() {
   
   // Setup error modal close button
   setupErrorModalClose();
+
+  // Initialize collapsible sections
+  initSectionToggles();
 }
 
 /**
