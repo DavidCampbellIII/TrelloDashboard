@@ -32,20 +32,11 @@ export function updateOverallProgress(cards: TrelloCard[], boardData: TrelloBoar
   }
   
   if (overallProgressBar) {
-    // Clear the existing progress bar
-    overallProgressBar.innerHTML = '';
+    // Directly update the width of the progress bar
+    overallProgressBar.style.width = `${Math.round(progress.completionPercentage)}%`;
     
-    // Create the progress bar
-    const progressBarElement = createProgressBar({
-      completedPercentage: progress.completionPercentage,
-      inProgressPercentage: progress.inProgressPercentage,
-      completedColorClass: 'bg-blue-500',
-      inProgressColorClass: 'bg-blue-faded',
-      height: '2.5'
-    });
-    
-    // Append the new progress bar
-    overallProgressBar.appendChild(progressBarElement);
+    // Make sure it has the right classes
+    overallProgressBar.className = 'bg-blue-500 h-2.5 rounded-full';
   }
   
   if (overallHours) {

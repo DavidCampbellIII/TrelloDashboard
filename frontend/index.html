@@ -16,9 +16,17 @@
     <div class="container mx-auto px-4 py-8">
         <!-- Header Section -->
         <header class="mb-8">
-            <div>
-                <h1 class="text-3xl font-bold text-white">Trello Dashboard Visualizer</h1>
-                <p class="text-gray-400">Project progress at a glance</p>
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-white">Trello Dashboard Visualizer</h1>
+                    <p class="text-gray-400">Project progress at a glance</p>
+                </div>
+                <button id="refresh-data" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Refresh Data
+                </button>
             </div>
         </header>
 
@@ -82,7 +90,17 @@
 
         <!-- Department Progress Section -->
         <div class="bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-700 hover-card">
-            <h2 class="text-xl font-semibold mb-4">Department Progress</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Department Progress</h2>
+                <button class="section-toggle text-gray-400 hover:text-white focus:outline-none" aria-expanded="true" aria-controls="department-progress-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 chevron-up" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 chevron-down hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+            </div>
             <div id="department-progress-container" class="space-y-4">
                 <!-- Dynamically populated with department progress bars -->
                 <div class="text-sm text-gray-400 italic">No data available</div>
@@ -91,7 +109,17 @@
 
         <!-- System Progress Section -->
         <div class="bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-700 hover-card">
-            <h2 class="text-xl font-semibold mb-4">System Progress</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">System Progress</h2>
+                <button class="section-toggle text-gray-400 hover:text-white focus:outline-none" aria-expanded="true" aria-controls="system-progress-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 chevron-up" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 chevron-down hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+            </div>
             <div id="system-progress-container" class="space-y-4">
                 <!-- Dynamically populated with system progress bars -->
                 <div class="text-sm text-gray-400 italic">No data available</div>
@@ -100,7 +128,17 @@
 
         <!-- Department + System Breakdown -->
         <div class="bg-gray-800 rounded-lg shadow-md p-6 border border-gray-700 hover-card">
-            <h2 class="text-xl font-semibold mb-4">Detailed Breakdown</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Detailed Breakdown</h2>
+                <button class="section-toggle text-gray-400 hover:text-white focus:outline-none" aria-expanded="true" aria-controls="detailed-breakdown-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 chevron-up" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 chevron-down hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+            </div>
             <div id="detailed-breakdown-container" class="space-y-6">
                 <!-- Dynamically populated -->
                 <div class="text-sm text-gray-400 italic">No data available</div>

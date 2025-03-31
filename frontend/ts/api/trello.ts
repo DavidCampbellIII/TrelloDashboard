@@ -33,8 +33,9 @@ export interface SanitizedBoardData {
   labels: SanitizedLabel[];
 }
 
-// Default Trello board ID to use if none is provided
-const DEFAULT_BOARD_ID = '***REMOVED***';
+// Default Trello board ID will be provided by environment variable
+// Falls back to an empty string, requiring explicit board ID to be passed
+const DEFAULT_BOARD_ID = process.env.TRELLO_BOARD_ID || '';
 
 /**
  * Fetches sanitized board data from Firebase Functions backend
@@ -42,6 +43,9 @@ const DEFAULT_BOARD_ID = '***REMOVED***';
  * @returns Promise resolving to the sanitized board data
  */
 export async function fetchBoardData(boardId: string = DEFAULT_BOARD_ID): Promise<SanitizedBoardData> {
+  if (!boardId) {
+    throw new Error('No Trello board ID provided and no default set in environment variables');
+  }
   try {
     const functions = getFunctions(getApp());
     const fetchTrelloBoardFunction = httpsCallable(functions, 'fetchTrelloBoard');

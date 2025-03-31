@@ -24,7 +24,7 @@ export function createProgressBar(options: ProgressBarOptions): HTMLElement {
   
   // Create container
   const container = document.createElement('div');
-  container.className = `w-full bg-gray-200 rounded-full h-${height} overflow-hidden`;
+  container.className = `w-full bg-gray-700 rounded-full h-${height} overflow-hidden`;
   
   // Create completed part
   const completedPart = document.createElement('div');
