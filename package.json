@@ -6,10 +6,9 @@
   "scripts": {
     "build": "node build.js",
     "watch": "node build.js --watch",
-    "serve": "serve frontend",
-    "serve:dist": "serve frontend/dist",
+    "serve": "serve frontend/dist",
     "start": "npm run build && npm run serve",
-    "start:dist": "npm run build && npm run serve:dist"
+    "dev": "npm run build && serve frontend"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

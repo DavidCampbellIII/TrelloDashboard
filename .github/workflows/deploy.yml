@@ -43,13 +43,6 @@ jobs:
         env:
           NODE_ENV: production
       
-      # Copy index.html to dist folder if it's not already there
-      - name: Ensure index.html is in the dist folder
-        run: |
-          if [ ! -f frontend/dist/index.html ]; then
-            cp frontend/index.html frontend/dist/
-          fi
-      
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:

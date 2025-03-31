@@ -8,15 +8,9 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMzE4MmNlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgY2xhc3M9ImZlYXRoZXIgZmVhdGhlci1jaGFydCI+PHBvbHlnb24gcG9pbnRzPSIyMy4yNyA5Ljk1IDE1LjczIDkuOTUgMTUuNzMgMi41IDE4LjczIDIuNSAyMy4yNyA3LjA0Ij48L3BvbHlnb24+PHBhdGggZD0iTTIyIDE2LjkydjQuNjFjMCAuNC0uMTYuNzgtLjQ0IDEuMDZBMS41IDEuNSAwIDAgMSAyMC41IDIzSDIuNWMtLjYgMC0xLjEtLjIyLTEuNS0uNjJBMi0yIDAgMCAxIC41IDE5LjYxVjRhMiAyIDAgMCAxIDItMmg3LjQ2TDEzIDE2YzAgLjMyLjA3LjYzLjE4LjkxLjEyLjI5LjI5LjU1LjUuNzcuMTcuMTkuMzguMzQuNjEuNDZhMS45NiAxLjk2IDAgMCAwIDEuMjIuMTlsNC4xNC0xLjAzYy4zNi0uMS42OC0uNDMuNzgtLjgyLjExLS4zOS0uMDgtLjk0LS40Mi0xLjA0TDEyIDE3Vjgu43M2w5IDE2LjU0LjA0LjA1YS43NS43NSAwIDAgMCAuOTcuMzQuNzYuNzYgMCAwIDAgLjM1LS45OEwxOCA5LjA4SC4wOFYyNCIvPjwvc3ZnPg==">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <!-- Dynamic CSS paths that work in both dev and prod environments -->
-    <script>
-        // Check if we're running from dist directory or root
-        const isDistPath = location.pathname.includes('/dist/');
-        const cssPath = isDistPath ? 'styles/tailwind.css' : 'styles/tailwind.css';
-        const cssAltPath = isDistPath ? 'tailwind.css' : 'dist/tailwind.css';
-        document.write(`<link rel="stylesheet" href="${cssPath}">`); 
-        document.write(`<link rel="stylesheet" href="${cssAltPath}">`); 
-    </script>
+    <!-- CSS Paths -->
+    <link rel="stylesheet" href="styles/tailwind.css">
+    <link rel="stylesheet" href="dist/tailwind.css">
     
     <!-- No need for Firebase script tags here as we're using the modular API via npm -->
 </head>
@@ -177,11 +171,7 @@
         </div>
     </div>
 
-    <!-- Dynamic script path that works in both dev and prod environments -->
-    <script>
-        // Check if we're running from dist directory or root
-        const scriptPath = location.pathname.includes('/dist/') ? 'bundle.js' : 'dist/bundle.js';
-        document.write(`<script src="${scriptPath}"><\/script>`);
-    </script>
+    <!-- Script path -->
+    <script src="dist/bundle.js"></script>
 </body>
 </html>
