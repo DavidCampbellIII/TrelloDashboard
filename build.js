@@ -56,6 +56,41 @@ async function build() {
     // Build the project
     console.log('Building with esbuild...');
     const result = await esbuild.build(buildOptions);
+    
+    // Copy index.html to dist folder
+    const indexFile = path.resolve(__dirname, 'frontend', 'index.html');
+    const distIndexFile = path.resolve(__dirname, 'frontend', 'dist', 'index.html');
+    
+    if (fs.existsSync(indexFile)) {
+      fs.copyFileSync(indexFile, distIndexFile);
+      console.log('Copied index.html to dist folder');
+    } else {
+      console.warn('Warning: index.html not found in frontend folder');
+    }
+    
+    // Copy any CSS files that might be needed
+    const stylesDir = path.resolve(__dirname, 'frontend', 'styles');
+    const distStylesDir = path.resolve(__dirname, 'frontend', 'dist', 'styles');
+    
+    if (fs.existsSync(stylesDir)) {
+      if (!fs.existsSync(distStylesDir)) {
+        fs.mkdirSync(distStylesDir, { recursive: true });
+      }
+      
+      // Copy all CSS files
+      const cssFiles = fs.readdirSync(stylesDir).filter(file => file.endsWith('.css'));
+      cssFiles.forEach(file => {
+        const srcFile = path.resolve(stylesDir, file);
+        const destFile = path.resolve(distStylesDir, file);
+        const destRootFile = path.resolve(distDir, file); // Also copy to root
+        
+        fs.copyFileSync(srcFile, destFile);
+        fs.copyFileSync(srcFile, destRootFile); // Copy to dist root for flat structure
+        
+        console.log(`Copied ${file} to dist/styles folder and dist root`);
+      });
+    }
+    
     console.log('Build complete!');
     
     // Show any warnings
