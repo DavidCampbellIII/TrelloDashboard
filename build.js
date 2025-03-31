@@ -37,7 +37,10 @@ const buildOptions = {
     '__FIREBASE_PROJECT_ID__': JSON.stringify(envVars.FIREBASE_PROJECT_ID || ''),
     '__FIREBASE_STORAGE_BUCKET__': JSON.stringify(envVars.FIREBASE_STORAGE_BUCKET || ''),
     '__FIREBASE_MESSAGING_SENDER_ID__': JSON.stringify(envVars.FIREBASE_MESSAGING_SENDER_ID || ''),
-    '__FIREBASE_APP_ID__': JSON.stringify(envVars.FIREBASE_APP_ID || '')
+    '__FIREBASE_APP_ID__': JSON.stringify(envVars.FIREBASE_APP_ID || ''),
+    
+    // Trello configuration
+    'process.env.TRELLO_BOARD_ID': JSON.stringify(envVars.TRELLO_BOARD_ID || '')
   }
 };
 

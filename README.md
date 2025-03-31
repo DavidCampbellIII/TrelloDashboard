@@ -26,8 +26,77 @@ The project is organized into frontend and backend components:
 
 ## Getting Started
 
-Documentation for setup and development coming soon.
+### Prerequisites
+
+- Node.js (v14 or later)
+- npm or yarn
+- Firebase account
+- Trello account with API key and token
+
+### Environment Setup
+
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/yourusername/trello-dashboard-visualizer.git
+cd trello-dashboard-visualizer
+```
+
+2. **Install dependencies**
+
+```bash
+npm install
+cd backend/functions
+npm install
+cd ../..
+```
+
+3. **Set up environment variables**
+
+Copy the example environment files and fill in your values:
+
+```bash
+# Frontend environment variables
+cp frontend/.env.example frontend/.env
+
+# Backend environment variables
+cp backend/functions/.env.example backend/functions/.env
+```
+
+You'll need to fill in:
+- Your Firebase project details in `frontend/.env`
+- Your Trello API credentials in `backend/functions/.env`
+
+4. **Build the project**
+
+```bash
+npm run build
+```
+
+5. **Run locally**
+
+```bash
+# Start the Firebase emulator for backend functions
+npm run serve:functions
+
+# In a separate terminal, start the frontend development server
+npm run serve:frontend
+```
+
+### Deployment
+
+1. **Deploy the backend**
+
+```bash
+npm run deploy:functions
+```
+
+2. **Deploy the frontend**
+
+```bash
+npm run deploy:frontend
+```
 
 ## License
 
-This project is proprietary and not licensed for public use.
+MIT License
