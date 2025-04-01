@@ -12,6 +12,15 @@ export function populateFilters(
   departmentFilter: HTMLSelectElement,
   systemFilter: HTMLSelectElement
 ) {
+  // Clear existing options, keeping only 'All' options
+  while (departmentFilter.options.length > 1) {
+    departmentFilter.remove(1);
+  }
+  
+  while (systemFilter.options.length > 1) {
+    systemFilter.remove(1);
+  }
+  
   // Extract unique department names from labels
   const departments = new Set<string>();
   boardData.labels.forEach(label => {
