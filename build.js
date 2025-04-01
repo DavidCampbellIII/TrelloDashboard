@@ -74,6 +74,12 @@ async function build() {
       indexContent = indexContent.replace('</body>', '    <script src="bundle.js"></script>\n</body>');
       
       // Write the modified index.html to the dist folder
+      // Replace any references to "dist/bundle.js" with "bundle.js"
+      indexContent = indexContent.replace(/dist\/bundle\.js/g, 'bundle.js');
+      
+      // Replace any references to "dist/tailwind.css" with "tailwind.css"
+      indexContent = indexContent.replace(/dist\/tailwind\.css/g, 'tailwind.css');
+      
       fs.writeFileSync(distIndexFile, indexContent);
       console.log('Created optimized index.html in dist folder');
     } else {
@@ -101,6 +107,14 @@ async function build() {
         
         console.log(`Copied ${file} to dist/styles folder and dist root`);
       });
+      
+      // Copy index.css explicitly as tailwind.css to dist root if it doesn't exist
+      const tailwindCssFile = path.resolve(stylesDir, 'tailwind.css');
+      const destTailwindCssFile = path.resolve(distDir, 'tailwind.css');
+      if (fs.existsSync(tailwindCssFile)) {
+        fs.copyFileSync(tailwindCssFile, destTailwindCssFile);
+        console.log('Copied tailwind.css to dist root');
+      }
     }
     
     // Check if there are other assets that need to be copied (images, fonts, etc.)

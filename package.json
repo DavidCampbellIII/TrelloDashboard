@@ -7,8 +7,7 @@
     "build": "node build.js",
     "watch": "node build.js --watch",
     "serve": "serve frontend/dist",
-    "start": "npm run build && npm run serve",
-    "dev": "npm run build && serve frontend"
+    "start": "npm run build && npm run serve"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
