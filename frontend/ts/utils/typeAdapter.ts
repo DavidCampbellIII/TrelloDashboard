@@ -15,6 +15,7 @@ export interface TrelloLabel {
 export interface TrelloCustomFields {
   estimatedHours?: number;
   system?: string;
+  priority?: string;
 }
 
 export interface TrelloCard {
@@ -90,7 +91,8 @@ export function convertToTrelloBoardData(data: SanitizedBoardData): TrelloBoardD
       labels: cardLabels,
       customFields: {
         estimatedHours: validatedHours,
-        system: card.system
+        system: card.system,
+        priority: card.priority
       }
     };
   });
