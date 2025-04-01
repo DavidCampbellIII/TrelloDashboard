@@ -98,6 +98,7 @@ interface SanitizedBoardData {
     labelColors: string[];
     estimatedHours?: number;
     system?: string;
+    priority?: string;
     status: "complete" | "in-progress" | "not-started";
   }[];
   lists: {
@@ -204,6 +205,67 @@ export const fetchTrelloBoard = functions.https.onCall(async (data, context) => 
         for (const card of cards) {
           // Skip archived/closed cards
           if (card.closed) continue;
+          
+          // Skip cards with "Pipedream" priority
+          let isPipedream = false;
+          if (card.customFieldItems) {
+            for (const field of card.customFieldItems) {
+              const fieldName = customFieldMap.get(field.idCustomField);
+              
+              // Check if this is a priority field
+              if (fieldName && fieldName.toLowerCase().includes("priority")) {
+                // Handle different types of custom fields
+                const customFieldDef = customFieldDefinitions.find(def => def.id === field.idCustomField);
+                
+                if (customFieldDef) {
+                  // Text field type
+                  if (customFieldDef.type === 'text' && field.value?.text) {
+                    if (field.value.text.toLowerCase() === "pipedream") {
+                      isPipedream = true;
+                      break;
+                    }
+                  } 
+                  // Dropdown/list field type
+                  else if ((customFieldDef.type === 'list' || customFieldDef.type === 'dropdown') && field.idValue) {
+                    if (customFieldDef.options && customFieldDef.options.length > 0) {
+                      const option = customFieldDef.options.find(opt => opt.id === field.idValue);
+                      if (option && option.value && option.value.text && 
+                          option.value.text.toLowerCase() === "pipedream") {
+                        isPipedream = true;
+                        break;
+                      }
+                    } else {
+                      // If options weren't fetched, try to fetch this specific option
+                      try {
+                        const optionResponse = await axios.get(`https://api.trello.com/1/customFields/${field.idCustomField}/options/${field.idValue}`, {
+                          params: {
+                            key: apiKey,
+                            token: token,
+                          }
+                        });
+                        
+                        if (optionResponse.data && optionResponse.data.value && 
+                            optionResponse.data.value.text && 
+                            optionResponse.data.value.text.toLowerCase() === "pipedream") {
+                          isPipedream = true;
+                          break;
+                        }
+                        
+                        // Store this option for future reference
+                        if (!customFieldDef.options) customFieldDef.options = [];
+                        customFieldDef.options.push(optionResponse.data);
+                      } catch (error) {
+                        // Silently handle error
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          
+          // Skip Pipedream cards entirely
+          if (isPipedream) continue;
 
           // Collect unique labels
           card.labels.forEach((label) => {
@@ -228,6 +290,7 @@ export const fetchTrelloBoard = functions.https.onCall(async (data, context) => 
           // Extract custom field values
           let estimatedHours: number | undefined;
           let system: string | undefined;
+          let priority: string | undefined;
 
           if (card.customFieldItems) {
             for (const field of card.customFieldItems) {
@@ -249,6 +312,65 @@ export const fetchTrelloBoard = functions.https.onCall(async (data, context) => 
                     const parsed = parseFloat(field.value.text);
                     if (!isNaN(parsed) && isFinite(parsed) && parsed >= 0 && parsed <= 10000) {
                       estimatedHours = parsed;
+                    }
+                  }
+                }
+              }
+              
+              // Check if this is a priority field
+              if (fieldName && fieldName.toLowerCase().includes("priority")) {
+                // Handle different types of custom fields
+                if (customFieldDef) {
+                  if (customFieldDef.type === 'text' && field.value?.text) {
+                    // For text fields, use the text value directly
+                    priority = field.value.text;
+                  } else if ((customFieldDef.type === 'list' || customFieldDef.type === 'dropdown') && field.idValue) {
+                    // For dropdown fields, look up the option text using the idValue
+                    if (customFieldDef.options && customFieldDef.options.length > 0) {
+                      const option = customFieldDef.options.find(opt => opt.id === field.idValue);
+                      if (option && option.value && option.value.text) {
+                        priority = option.value.text;
+                      } else {
+                        // If we can't find the option, try to fetch it directly
+                        try {
+                          const optionResponse = await axios.get(`https://api.trello.com/1/customFields/${field.idCustomField}/options/${field.idValue}`, {
+                            params: {
+                              key: apiKey,
+                              token: token,
+                            }
+                          });
+                          
+                          if (optionResponse.data && optionResponse.data.value && optionResponse.data.value.text) {
+                            priority = optionResponse.data.value.text;
+                            
+                            // Store this option for future reference
+                            if (!customFieldDef.options) customFieldDef.options = [];
+                            customFieldDef.options.push(optionResponse.data);
+                          }
+                        } catch (error) {
+                          // Silently handle error
+                        }
+                      }
+                    } else {
+                      // If no options were found earlier, try to fetch this specific option
+                      try {
+                        const optionResponse = await axios.get(`https://api.trello.com/1/customFields/${field.idCustomField}/options/${field.idValue}`, {
+                          params: {
+                            key: apiKey,
+                            token: token,
+                          }
+                        });
+                        
+                        if (optionResponse.data && optionResponse.data.value && optionResponse.data.value.text) {
+                          priority = optionResponse.data.value.text;
+                          
+                          // Initialize options array and store this option
+                          if (!customFieldDef.options) customFieldDef.options = [];
+                          customFieldDef.options.push(optionResponse.data);
+                        }
+                      } catch (error) {
+                        // Silently handle error
+                      }
                     }
                   }
                 }
@@ -324,6 +446,7 @@ export const fetchTrelloBoard = functions.https.onCall(async (data, context) => 
             labelColors: card.labels.map((label) => label.color),
             estimatedHours,
             system,
+            priority,
             status,
           });
         }

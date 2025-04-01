@@ -13,6 +13,7 @@ export interface SanitizedCard {
   labelColors: string[];
   estimatedHours?: number;
   system?: string;
+  priority?: string;
   status: 'complete' | 'in-progress' | 'not-started';
 }
 

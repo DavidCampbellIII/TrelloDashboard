@@ -90,7 +90,11 @@ export function filterCards(
     const matchesSystem = selectedSystem === 'all' || 
       card.customFields.system === selectedSystem;
     
-    return matchesDepartment && matchesSystem;
+    // Note: Cards with priority "Pipedream" are already filtered out by the backend,
+    // but we add this check as an additional safeguard
+    const isPipedream = card.customFields.priority?.toLowerCase() === 'pipedream';
+    
+    return matchesDepartment && matchesSystem && !isPipedream;
   });
 }
 
