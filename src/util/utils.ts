@@ -1,8 +1,12 @@
-import type { Label } from "../types";
+import type { Label, ProgressBarColors } from "../types";
 
-export function getProgressBarColors(department: Label): { main: string; inProgress: string } {
+export function getProgressBarColors(department?: Label): ProgressBarColors {
+    if (!department) {
+        return { completedColor: 'bg-magenta-500', inProgressColor: 'bg-magenta-400' };
+    }
+
     return {
-        main: `label-${department.color}`,
-        inProgress: `label-${department.color}-faded`
+        completedColor: `label-${department.color}`,
+        inProgressColor: `label-${department.color}-faded`
     }
 }

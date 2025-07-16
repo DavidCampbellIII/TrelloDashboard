@@ -1,20 +1,19 @@
 import { create } from "zustand";
-import type { CustomFieldOption, Label } from "../types";
 
 type FilterState = {
-    department: Label | null;
-    setDepartment: (department: Label | null) => void;
+    department?: string;
+    setDepartment: (department?: string) => void;
 
-    system: CustomFieldOption | null;
-    setSystem: (system: CustomFieldOption | null) => void;
+    system?: string;
+    setSystem: (system?: string) => void;
 };
 
 const useFilterStore = create<FilterState>((set) => ({
-    department: null,
-    setDepartment: (department: Label | null) => set({ department }),
+    department: undefined,
+    setDepartment: (department?: string) => set({ department }),
 
-    system: null,
-    setSystem: (system: CustomFieldOption | null) => set({ system })
+    system: undefined,
+    setSystem: (system?: string) => set({ system })
 }));
 
 export default useFilterStore;

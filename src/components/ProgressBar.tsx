@@ -1,26 +1,13 @@
-import type { Label } from "../types";
-import { getProgressBarColors } from "../util/utils";
+import type { ProgressBarData } from "../types";
 
 type Props = {
-    department: Label;
-    tasksNotStarted: number;
-    tasksInProgress: number;
-    tasksCompleted: number;
-    inProgressHours: number;
-    completedHours: number;
-    totalHours: number;
+    data: ProgressBarData;
 };
 
-export default function ProgressBar({
-    department,
-    tasksNotStarted,
-    tasksInProgress,
-    tasksCompleted,
-    inProgressHours,
-    completedHours,
-    totalHours
-}: Props) {
-    const { main, inProgress } = getProgressBarColors(department);
+export default function ProgressBar({ data }: Props) {
+    const { label, colors, tasksNotStarted, tasksInProgress, tasksCompleted, completedHours, inProgressHours, totalHours } = data;
+
+    console.log(`Rendering ProgressBar for ${label} with data:`, data);
 
     const totalTasks = tasksNotStarted + tasksInProgress + tasksCompleted;
     const completedHoursProgress = (completedHours / totalHours) * 100;
@@ -29,16 +16,16 @@ export default function ProgressBar({
   return (
     <div className='flex flex-col gap-2'>
         <div className='flex justify-between text-white'>
-            <h3 className='text-xl'>{department.name}</h3>
-            <div className='text-lg'>{totalHoursProgress}% completed</div>
+            <h3 className='text-xl'>{label}</h3>
+            <div className='text-lg'>{completedHoursProgress.toFixed(1)}% completed</div>
         </div>
         <div className={`relative bg-gray-600 w-full rounded-lg h-4 overflow-clip`}>
             <div 
-                className={`${inProgress} rounded-lg h-full absolute top-0 left-0`}
+                className={`${colors.inProgressColor} rounded-lg h-full absolute top-0 left-0`}
                 style={{ width: `${totalHoursProgress}%` }}
             ></div>
             <div 
-                className={`${main} rounded-lg h-full z-10 absolute top-0 left-0 min-w-[10px]`}
+                className={`${colors.completedColor} rounded-lg h-full z-10 absolute top-0 left-0 min-w-[10px]`}
                 style={{ width: `${completedHoursProgress}%` }}
             ></div>
         </div>

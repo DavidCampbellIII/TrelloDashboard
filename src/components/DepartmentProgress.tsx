@@ -1,8 +1,10 @@
+import useBoard from "../hooks/useBoard";
 import useFilterStore from "../hooks/useFiltersStore";
 import ProgressBar from "./ProgressBar";
 
 export default function DepartmentProgress() {
-    const { department } = useFilterStore();
+    const { department, system } = useFilterStore();
+    const { departmentProgress } = useBoard(department || '', system || '');
 
   return (
     <div className='card'>
@@ -10,22 +12,19 @@ export default function DepartmentProgress() {
         <div className='flex flex-col gap-4'>
             {department ? (
                 <div className='text-white'>
-                    <h3 className='text-xl font-semibold'>{department.name}</h3>
-                    </div> 
+                    <h3 className='text-xl font-semibold'>{department}</h3>
+                    {departmentProgress.map(data => (
+                        <ProgressBar
+                            key={data.label}
+                            data={data}
+                        />
+                    ))}
+                </div> 
             ) : (
                 <div className='text-gray-500'>
                     <p>Select a department to view progress</p>
                 </div>
             )}
-            {department && <ProgressBar 
-                department={department}
-                tasksNotStarted={50}
-                tasksInProgress={5}
-                tasksCompleted={45}
-                inProgressHours={25}
-                completedHours={50}
-                totalHours={100}
-            />}
         </div>
     </div>
   )

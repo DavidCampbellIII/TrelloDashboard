@@ -1,20 +1,22 @@
 import { create } from "zustand";
-import type { CustomFieldOption, Label, TrelloBoardRawExport, TrelloList } from "../types";
-import extractData from "../util/readBoardData";
+import type { SystemFieldOption, Label, TrelloBoardRawExport, TrelloList, TrelloTask } from "../types";
+import extractBoardData from "../util/extractBoardData";
 
 type BoardState = {
     labels: Label[];
-    customFields: CustomFieldOption[];
+    systems: SystemFieldOption[];
     lists: TrelloList[];
+    tasks: TrelloTask[];
     importData: (data: TrelloBoardRawExport) => void;
 };
 
 const useBoardStore = create<BoardState>((set) => ({
     labels: [],
-    customFields: [],
+    systems: [],
     lists: [],
+    tasks: [],
 
-    importData: (data: TrelloBoardRawExport) => set(extractData(data))
+    importData: (data: TrelloBoardRawExport) => set(extractBoardData(data))
 }));
 
 export default useBoardStore;

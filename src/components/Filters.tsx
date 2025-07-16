@@ -2,19 +2,27 @@ import useBoardStore from "../hooks/useBoardStore";
 import useFilterStore from "../hooks/useFiltersStore";
 
 export default function Filters() {
-    const { labels: departments, customFields: systems } = useBoardStore();
+    const { labels: departments, systems } = useBoardStore();
     const { setDepartment, setSystem } = useFilterStore();
 
     const handleSelectDepartment = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedDepartmentId = event.target.value;
-        const selectedDepartment = departments.find(department => department.id === selectedDepartmentId) || null;
-        setDepartment(selectedDepartment);
+        if (selectedDepartmentId === 'all') {
+            setDepartment('all');
+            return;
+        }
+        const selectedDepartment = departments.find(department => department.id === selectedDepartmentId) ?? null;
+        setDepartment(selectedDepartment?.name);
     };
 
     const handleSelectSystem = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedSystemId = event.target.value;
-        const selectedSystem = systems.find(system => system.id === selectedSystemId) || null;
-        setSystem(selectedSystem);
+        if (selectedSystemId === 'all') {
+            setSystem('all');
+            return;
+        }
+        const selectedSystem = systems.find(system => system.id === selectedSystemId) ?? null;
+        setSystem(selectedSystem?.name);
     };
 
   return (
@@ -30,6 +38,11 @@ export default function Filters() {
                     className='p-2 rounded bg-gray-700 text-white min-w-xs'
                     onChange={handleSelectDepartment}
                 >
+                    {departments.length > 0 && <>
+                            <option value=''>Select a department</option>
+                            <option value='all'>All</option>
+                        </>
+                    }
                     {departments.length > 0 ? departments.map(department => (
                         <option key={department.id} value={department.id}>
                             {department.name}
@@ -48,6 +61,11 @@ export default function Filters() {
                     className='p-2 rounded bg-gray-700 text-white min-w-xs'
                     onChange={handleSelectSystem}
                 >
+                    {systems.length > 0 && <>
+                            <option value=''>Select a system</option>
+                            <option value='all'>All</option>
+                        </>
+                    }
                     {systems.length > 0 ? systems.map(system => (
                         <option key={system.id} value={system.id}>
                             {system.name}
