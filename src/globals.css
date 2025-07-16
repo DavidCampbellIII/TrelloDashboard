@@ -5,3 +5,80 @@
     @apply text-gray-500 dark:text-gray-400;
   }
 }
+
+/* Custom color classes for Trello labels
+    Includes base colors, light variants, and dark variants.
+    Also includes faded versions of each variant for in-progress indicators.
+*/
+/* Base colors */
+.label-red { background-color: #eb5a46; }
+.label-orange { background-color: #ff9f1a; }
+.label-yellow { background-color: #f2d600; }
+.label-green { background-color: #61bd4f; }
+.label-blue { background-color: #0079bf; }
+.label-purple { background-color: #c377e0; }
+.label-pink { background-color: #ff78cb; }
+.label-sky { background-color: #00c2e0; }
+.label-lime { background-color: #51e898; }
+.label-black { background-color: #344563; }
+
+/* Light variants */
+.label-red_light { background-color: #b04632; }
+.label-orange_light { background-color: #d68000; }
+.label-yellow_light { background-color: #d9b51c; }
+.label-green_light { background-color: #4a913c; }
+.label-blue_light { background-color: #055a8c; }
+.label-purple_light { background-color: #a15da6; }
+.label-pink_light { background-color: #e362b5; }
+.label-sky_light { background-color: #0098b7; }
+.label-lime_light { background-color: #42b883; }
+.label-black_light { background-color: #292e3a; }
+
+/* Dark variants */
+.label-red_dark { background-color: #f5a397; }
+.label-orange_dark { background-color: #ffbc5c; }
+.label-yellow_dark { background-color: #f5e056; }
+.label-green_dark { background-color: #8ed082; }
+.label-blue_dark { background-color: #5eaadf; }
+.label-purple_dark { background-color: #d9a6eb; }
+.label-pink_dark { background-color: #ff9fd8; }
+.label-sky_dark { background-color: #67d7eb; }
+.label-lime_dark { background-color: #85eeb2; }
+.label-black_dark { background-color: #6b798c; }
+
+/* Faded base variants */
+.label-red-faded { background-color: rgba(235, 90, 70, 0.5); }
+.label-orange-faded { background-color: rgba(255, 159, 26, 0.5); }
+.label-yellow-faded { background-color: rgba(242, 214, 0, 0.5); }
+.label-green-faded { background-color: rgba(97, 189, 79, 0.5); }
+.label-blue-faded { background-color: rgba(0, 121, 191, 0.5); }
+.label-purple-faded { background-color: rgba(195, 119, 224, 0.5); }
+.label-pink-faded { background-color: rgba(255, 120, 203, 0.5); }
+.label-sky-faded { background-color: rgba(0, 194, 224, 0.5); }
+.label-lime-faded { background-color: rgba(81, 232, 152, 0.5); }
+.label-black-faded { background-color: rgba(52, 69, 99, 0.5); }
+.bg-blue-faded { background-color: rgba(59, 130, 246, 0.5); }
+
+/* Faded light variants */
+.label-red_light-faded { background-color: rgba(176, 70, 50, 0.5); }
+.label-orange_light-faded { background-color: rgba(214, 128, 0, 0.5); }
+.label-yellow_light-faded { background-color: rgba(217, 181, 28, 0.5); }
+.label-green_light-faded { background-color: rgba(74, 145, 60, 0.5); }
+.label-blue_light-faded { background-color: rgba(5, 90, 140, 0.5); }
+.label-purple_light-faded { background-color: rgba(161, 93, 166, 0.5); }
+.label-pink_light-faded { background-color: rgba(227, 98, 181, 0.5); }
+.label-sky_light-faded { background-color: rgba(0, 152, 183, 0.5); }
+.label-lime_light-faded { background-color: rgba(66, 184, 131, 0.5); }
+.label-black_light-faded { background-color: rgba(41, 46, 58, 0.5); }
+
+/* Faded dark variants */
+.label-red_dark-faded { background-color: rgba(245, 163, 151, 0.5); }
+.label-orange_dark-faded { background-color: rgba(255, 188, 92, 0.5); }
+.label-yellow_dark-faded { background-color: rgba(245, 224, 86, 0.5); }
+.label-green_dark-faded { background-color: rgba(142, 208, 130, 0.5); }
+.label-blue_dark-faded { background-color: rgba(94, 170, 223, 0.5); }
+.label-purple_dark-faded { background-color: rgba(217, 166, 235, 0.5); }
+.label-pink_dark-faded { background-color: rgba(255, 159, 216, 0.5); }
+.label-sky_dark-faded { background-color: rgba(103, 215, 235, 0.5); }
+.label-lime_dark-faded { background-color: rgba(133, 238, 178, 0.5); }
+.label-black_dark-faded { background-color: rgba(107, 121, 140, 0.5); }
