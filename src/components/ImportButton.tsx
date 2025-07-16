@@ -4,7 +4,7 @@ import useBoardStore from "../hooks/useBoardStore";
 
 export default function ImportButton() {
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { labels, customFields, lists, importData } = useBoardStore();
+    const { importData } = useBoardStore();
 
     const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -12,10 +12,6 @@ export default function ImportButton() {
 
         const text = await file.text();
         importData(JSON.parse(text));
-
-        console.log("Labels:", labels);
-        console.log("Custom Fields:", customFields);
-        console.log("Lists:", lists);
     };
 
   return (

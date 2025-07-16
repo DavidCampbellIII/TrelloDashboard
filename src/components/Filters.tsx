@@ -1,17 +1,35 @@
 import useBoardStore from "../hooks/useBoardStore";
+import useFilterStore from "../hooks/useFiltersStore";
 
 export default function Filters() {
     const { labels: departments, customFields: systems } = useBoardStore();
+    const { setDepartment, setSystem } = useFilterStore();
+
+    const handleSelectDepartment = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedDepartmentId = event.target.value;
+        const selectedDepartment = departments.find(department => department.id === selectedDepartmentId) || null;
+        setDepartment(selectedDepartment);
+    };
+
+    const handleSelectSystem = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedSystemId = event.target.value;
+        const selectedSystem = systems.find(system => system.id === selectedSystemId) || null;
+        setSystem(selectedSystem);
+    };
 
   return (
-    <div className='rounded-xl bg-gray-800 p-4 my-4 w-full'>
+    <div className='card'>
         <h2 className='text-2xl font-semibold text-white mb-4'>Filters</h2>
         <div className='flex gap-4'>
             <div className='flex flex-col gap-2'>
                 <label className='text-base text-subtitle' htmlFor='department-select'>
                 Department
                 </label>
-                <select id='department-select' className='p-2 rounded bg-gray-700 text-white min-w-xs'>
+                <select 
+                    id='department-select' 
+                    className='p-2 rounded bg-gray-700 text-white min-w-xs'
+                    onChange={handleSelectDepartment}
+                >
                     {departments.length > 0 ? departments.map(department => (
                         <option key={department.id} value={department.id}>
                             {department.name}
@@ -25,7 +43,11 @@ export default function Filters() {
                 <label className='text-base text-subtitle' htmlFor='system-select'>
                 System
                 </label>
-                <select id='system-select' className='p-2 rounded bg-gray-700 text-white min-w-xs'>
+                <select 
+                    id='system-select' 
+                    className='p-2 rounded bg-gray-700 text-white min-w-xs'
+                    onChange={handleSelectSystem}
+                >
                     {systems.length > 0 ? systems.map(system => (
                         <option key={system.id} value={system.id}>
                             {system.name}

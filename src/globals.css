@@ -4,6 +4,10 @@
   .text-subtitle {
     @apply text-gray-500 dark:text-gray-400;
   }
+
+  .card {
+    @apply rounded-xl bg-gray-800 p-4 my-4 w-full;
+  }
 }
 
 /* Custom color classes for Trello labels

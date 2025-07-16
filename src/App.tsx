@@ -1,4 +1,5 @@
 
+import DepartmentProgress from './components/DepartmentProgress';
 import Filters from './components/Filters';
 import NavBar from './components/NavBar';
 
@@ -9,6 +10,7 @@ export default function App() {
       <div className='max-w-[1600px] mx-8 w-full'>
         <NavBar />
         <Filters />
+        <DepartmentProgress />
       </div>
     </div>
   )

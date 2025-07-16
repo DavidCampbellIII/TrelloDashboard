@@ -11,13 +11,8 @@ type BoardState = {
 
 const useBoardStore = create<BoardState>((set) => ({
     labels: [],
-    setLabels: (labels: Label[]) => set({ labels }),
-
     customFields: [],
-    setCustomFields: (customFields: CustomFieldOption[]) => set({ customFields }),
-
     lists: [],
-    setLists: (lists: TrelloList[]) => set({ lists }),
 
     importData: (data: TrelloBoardRawExport) => set(extractData(data))
 }));
