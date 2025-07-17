@@ -14,9 +14,6 @@ export default function DepartmentProgressBar({ data }: Props) {
         tasksWithoutHours,
     } = data;
 
-    console.log(`Rendering ProgressBar for ${label} with data:`, data);
-
-    
     const { tasksCompleted, tasksInProgress, totalTasks,
         completedHours, totalHours,
         totalPointsFromTasks,

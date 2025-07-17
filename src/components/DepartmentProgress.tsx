@@ -25,7 +25,19 @@ export default function DepartmentProgress() {
     <div className='card'>
         <h2 className='text-2xl font-semibold text-white mb-4'>Department Progress</h2>
         <div className='flex flex-col gap-4'>
-            {department && departmentProgress.length > 0 ? (
+            {department && departmentProgress.length > 0 ? 
+                department === 'all' ? (
+                    <div className='flex flex-col gap-4'>
+                        {departmentProgress.map(data => (
+                            <DepartmentProgressBar
+                                key={data.label}
+                                data={data}
+                            />
+                        ))}
+                    </div>
+                )
+                :
+                (
                 <div className='flex flex-col'>
                     {selectedDepartment && (
                         <DepartmentProgressBar
