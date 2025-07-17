@@ -11,7 +11,7 @@ const useBoard = (department: string, system: string) => {
     const filteredTasks = useMemo(() => {
         return tasks.filter(task => {
             const matchesDepartment = department === 'all' || task.labels.some(label => label.name === department);
-            const matchesSystem = system === 'all' || task.system === system;
+            const matchesSystem = system === 'all' || task.system === system || (system === 'none' && !task.system);
             return matchesDepartment && matchesSystem;
         });
     }, [department, system, tasks]);
@@ -40,18 +40,18 @@ const useBoard = (department: string, system: string) => {
             let totalHours = 0;
 
             tasks.forEach(task => {
-                totalHours += task.hours;
+                totalHours += task.hours ?? 0;
                 switch (task.status) {
                     case TaskStatus.NotStarted:
                         tasksNotStarted++;
                         break;
                     case TaskStatus.InProgress:
                         tasksInProgress++;
-                        inProgressHours += task.hours;
+                        inProgressHours += task.hours ?? 0;
                         break;
                     case TaskStatus.Completed:
                         tasksCompleted++;
-                        completedHours += task.hours;
+                        completedHours += task.hours ?? 0;
                         break;
                 }
             });

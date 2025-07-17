@@ -50,7 +50,7 @@ const extractBoardData = (data: TrelloBoardRawExport) => {
 
     const estimatedHoursField = data.customFields.find(field => field.name === ESTIMATED_HOURS_CUSTOM_FIELD_NAME);
     const tasks: TrelloTask[] = data.cards
-        .filter(card => !card.closed && card.customFieldItems.length > 0)
+        .filter(card => !card.closed)
         .map(card => {
             //console.log(`${card.customFieldItems[0].idCustomField} - ${card.customFieldItems[0].idValue} - ${card.customFieldItems[0].value?.number}`);
             const systemValue = card.customFieldItems.find(item => item.idCustomField === systemField?.id);
@@ -71,10 +71,6 @@ const extractBoardData = (data: TrelloBoardRawExport) => {
     const usedLabels = new Set<Label>();
     tasks.forEach(task => {
         task.labels.forEach(label => usedLabels.add(label));
-    });
-
-    usedLabels.forEach(label => {
-        console.log(`Label: ${label.name} (${label.id})`);
     });
 
     return { 
