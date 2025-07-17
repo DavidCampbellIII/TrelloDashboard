@@ -4,6 +4,7 @@ import DepartmentsHighlights from './components/DepartmentsHighlights';
 import Filters from './components/Filters';
 import NavBar from './components/NavBar';
 import OverallProgress from './components/OverallProgress';
+import SystemsHighlights from './components/SystemsHighlights';
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <div className='flex gap-4'>
           <OverallProgress />
           <DepartmentsHighlights />
+          <SystemsHighlights />
         </div>
         <Filters />
         <DepartmentProgress />

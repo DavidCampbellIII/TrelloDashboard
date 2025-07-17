@@ -17,7 +17,7 @@ const useBoard = (department: string, system: string) => {
     }, [department, system, tasks]);
 
     //next, group tasks into each department they belong to
-    const groupedTasks = useMemo(() => {
+    const departmentGroupedTasks = useMemo(() => {
         return filteredTasks.reduce((acc, task) => {
             task.labels.forEach(label => {
                 if (!acc[label.id]) {
@@ -31,7 +31,7 @@ const useBoard = (department: string, system: string) => {
 
     //finally, calculate the progress for each department
     const departmentProgress: ProgressBarData[] = useMemo(() => {
-        const data = Object.entries(groupedTasks).map(([labelId, tasks]) => {
+        const data = Object.entries(departmentGroupedTasks).map(([labelId, tasks]) => {
             
             const { tasksWithoutHours, tasksWithHours } = calcTaskHours(tasks);
             const label = labels.find(label => label.id === labelId);
@@ -44,15 +44,9 @@ const useBoard = (department: string, system: string) => {
             };
         });
 
-        const outstanding = (p: ProgressBarData) =>
-            p.tasksWithHours.notStarted.numTasks +
-            p.tasksWithHours.inProgress.numTasks +
-            p.tasksWithoutHours.notStarted +
-            p.tasksWithoutHours.inProgress;
-
         //sort by largest backlog first
         return data.sort((a, b) => outstanding(b) - outstanding(a));
-    }, [groupedTasks, labels]);
+    }, [departmentGroupedTasks, labels]);
 
     const overallProgress: ProgressBarData = useMemo(() => {
         const { tasksWithoutHours, tasksWithHours } = calcTaskHours(tasks);
@@ -65,9 +59,41 @@ const useBoard = (department: string, system: string) => {
         };
     }, [tasks]);
 
+    const systemGroupedTasks = useMemo(() => {
+        return filteredTasks.reduce((acc, task) => {
+            //don't include tasks without a system
+            if (!task.system) {
+                return acc;
+            }
+            if (!acc[task.system]) {
+                acc[task.system] = [];
+            }
+            acc[task.system].push(task);
+            return acc;
+        }, {} as Record<string, typeof filteredTasks>);
+    }, [filteredTasks]);
+
+    const systemsProgress: ProgressBarData[] = useMemo(() => {
+        const data = Object.entries(systemGroupedTasks).map(([systemName, tasks]) => {
+            
+            const { tasksWithoutHours, tasksWithHours } = calcTaskHours(tasks);
+
+            return {
+                label: systemName,
+                colors: getProgressBarColors({name: 'all'} as Label),
+                tasksWithHours,
+                tasksWithoutHours,
+            };
+        });
+
+        //sort by largest backlog first
+        return data.sort((a, b) => outstanding(b) - outstanding(a));
+    }, [systemGroupedTasks]);
+
     return {
         overallProgress,
-        departmentProgress
+        departmentProgress,
+        systemsProgress,
     };
 };
 
@@ -125,5 +151,11 @@ const calcTaskHours = (tasks: TrelloTask[]):
 
     return { tasksWithoutHours, tasksWithHours };
 };
+
+const outstanding = (p: ProgressBarData) =>
+    p.tasksWithHours.notStarted.numTasks +
+    p.tasksWithHours.inProgress.numTasks +
+    p.tasksWithoutHours.notStarted +
+    p.tasksWithoutHours.inProgress;
 
 export default useBoard;
