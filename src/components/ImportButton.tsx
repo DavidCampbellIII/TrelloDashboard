@@ -1,10 +1,12 @@
 import { CiImport } from "react-icons/ci";
 import { useRef } from "react";
 import useBoardStore from "../hooks/useBoardStore";
+import useFilterStore from "../hooks/useFiltersStore";
 
 export default function ImportButton() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { importData } = useBoardStore();
+    const { setDepartment, setSystem } = useFilterStore();
 
     const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -12,6 +14,10 @@ export default function ImportButton() {
 
         const text = await file.text();
         importData(JSON.parse(text));
+
+        //set filters to show all on initial import
+        setDepartment('all');
+        setSystem('all');
     };
 
   return (

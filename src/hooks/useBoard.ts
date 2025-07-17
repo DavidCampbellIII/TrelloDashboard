@@ -31,27 +31,52 @@ const useBoard = (department: string, system: string) => {
 
     //finally, calculate the progress for each department
     const departmentProgress: ProgressBarData[] = useMemo(() => {
-        return Object.entries(groupedTasks).map(([labelId, tasks]) => {
-            let tasksNotStarted = 0;
-            let tasksInProgress = 0;
-            let tasksCompleted = 0;
-            let inProgressHours = 0;
-            let completedHours = 0;
-            let totalHours = 0;
+        const data = Object.entries(groupedTasks).map(([labelId, tasks]) => {
+            const tasksWithoutHours = {
+                notStarted: 0,
+                inProgress: 0,
+                completed: 0
+            };
+            const tasksWithHours = {
+                    notStarted: {
+                        numTasks: 0,
+                        hours: 0,
+                    },
+                    inProgress: {
+                        numTasks: 0,
+                        hours: 0
+                    },
+                    completed: {
+                        numTasks: 0,
+                        hours: 0,
+                    }
+                };
 
             tasks.forEach(task => {
-                totalHours += task.hours ?? 0;
                 switch (task.status) {
                     case TaskStatus.NotStarted:
-                        tasksNotStarted++;
+                        if (task.hours) {
+                            tasksWithHours.notStarted.numTasks++;
+                            tasksWithHours.notStarted.hours += task.hours;
+                        } else {
+                            tasksWithoutHours.notStarted++;
+                        }
                         break;
                     case TaskStatus.InProgress:
-                        tasksInProgress++;
-                        inProgressHours += task.hours ?? 0;
+                        if (task.hours) {
+                            tasksWithHours.inProgress.numTasks++;
+                            tasksWithHours.inProgress.hours += task.hours;
+                        } else {
+                            tasksWithoutHours.inProgress++;
+                        }
                         break;
                     case TaskStatus.Completed:
-                        tasksCompleted++;
-                        completedHours += task.hours ?? 0;
+                        if (task.hours) {
+                            tasksWithHours.completed.numTasks++;
+                            tasksWithHours.completed.hours += task.hours;
+                        } else {
+                            tasksWithoutHours.completed++;
+                        }
                         break;
                 }
             });
@@ -61,14 +86,19 @@ const useBoard = (department: string, system: string) => {
             return {
                 label: label!.name,
                 colors: getProgressBarColors(label),
-                tasksNotStarted,
-                tasksInProgress,
-                tasksCompleted,
-                inProgressHours,
-                completedHours,
-                totalHours,
+                tasksWithHours,
+                tasksWithoutHours,
             };
         });
+
+        const outstanding = (p: ProgressBarData) =>
+            p.tasksWithHours.notStarted.numTasks +
+            p.tasksWithHours.inProgress.numTasks +
+            p.tasksWithoutHours.notStarted +
+            p.tasksWithoutHours.inProgress;
+
+    //sort by largest backlog first
+    return data.sort((a, b) => outstanding(b) - outstanding(a));
     }, [groupedTasks, labels]);
 
     return {

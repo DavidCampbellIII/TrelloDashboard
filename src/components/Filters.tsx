@@ -39,7 +39,7 @@ export default function Filters() {
                     onChange={handleSelectDepartment}
                 >
                     {departments.length > 0 && <>
-                            <option value=''>Select a department</option>
+                            <option value='' disabled>Select a department</option>
                             <option value='all'>All</option>
                         </>
                     }
@@ -62,7 +62,7 @@ export default function Filters() {
                     onChange={handleSelectSystem}
                 >
                     {systems.length > 0 && <>
-                            <option value=''>Select a system</option>
+                            <option value='' disabled>Select a system</option>
                             <option value='all'>All</option>
                         </>
                     }

@@ -75,10 +75,23 @@ export type ProgressBarColors = {
 export type ProgressBarData = {
     label: string;
     colors: ProgressBarColors;
-    tasksNotStarted: number;
-    tasksInProgress: number;
-    tasksCompleted: number;
-    inProgressHours: number;
-    completedHours: number;
-    totalHours: number;
+    tasksWithHours: {
+        notStarted: {
+            numTasks: number;
+            hours: number;
+        };
+        inProgress: {
+            numTasks: number;
+            hours: number;
+        };
+        completed: {
+            numTasks: number;
+            hours: number;
+        }
+    };
+    tasksWithoutHours: {
+        notStarted: number;
+        inProgress: number;
+        completed: number;
+    };
 };
