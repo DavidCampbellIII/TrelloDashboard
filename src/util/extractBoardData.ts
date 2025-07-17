@@ -41,8 +41,6 @@ const extractBoardData = (data: TrelloBoardRawExport) => {
             name: o.value.text
         })) ?? [];
 
-    console.log('Extracted systems:', systems);
-
     const lists: TrelloList[] = data.lists
         .filter(list => !list.closed)
         .map(list => ({
@@ -54,28 +52,37 @@ const extractBoardData = (data: TrelloBoardRawExport) => {
     const tasks: TrelloTask[] = data.cards
         .filter(card => !card.closed && card.customFieldItems.length > 0)
         .map(card => {
-            console.log(`${card.customFieldItems[0].idCustomField} - ${card.customFieldItems[0].idValue} - ${card.customFieldItems[0].value?.number}`);
+            //console.log(`${card.customFieldItems[0].idCustomField} - ${card.customFieldItems[0].idValue} - ${card.customFieldItems[0].value?.number}`);
             const systemValue = card.customFieldItems.find(item => item.idCustomField === systemField?.id);
             const systemId = systemValue?.idValue || null;
-            const system = systems.find(s => s.id === systemId)?.name ?? 'Unknown';
-            if(system === 'Unknown') {
-                console.warn(`System not found for card, system was: ${systemId} and system value was: ${systemValue}`);
-            }
+            const system = systems.find(s => s.id === systemId)?.name;
 
-            const hoursValue = card.customFieldItems.find(item => item.idCustomField === estimatedHoursField?.id)?.value?.number || '0';
-            if(hoursValue === '0') {
-                console.warn(`Estimated hours not found for card, using default value of 0`);
-            }
+            const hoursValue = card.customFieldItems.find(item => item.idCustomField === estimatedHoursField?.id)?.value?.number;
 
             return {
                 status: determineCardStatus(lists.find(list => list.id === card.idList)?.name || ''),
-                labels: card.idLabels.map(id => labels.find(label => label.id === id)).filter(Boolean) as Label[],
+                labels: labels.filter(({ id }) => card.idLabels.includes(id)),
                 system: system,
-                hours: parseFloat(hoursValue),
+                hours: hoursValue ? parseFloat(hoursValue) : undefined,
             };
         });
 
-    return { labels, systems, lists, tasks };
+    //don't bother including any labels that are not used by any tasks
+    const usedLabels = new Set<Label>();
+    tasks.forEach(task => {
+        task.labels.forEach(label => usedLabels.add(label));
+    });
+
+    usedLabels.forEach(label => {
+        console.log(`Label: ${label.name} (${label.id})`);
+    });
+
+    return { 
+        labels: [...usedLabels.values()], 
+        systems, 
+        lists, 
+        tasks 
+    };
 }
 
 export default extractBoardData;

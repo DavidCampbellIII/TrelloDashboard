@@ -17,8 +17,8 @@ export default function Filters() {
 
     const handleSelectSystem = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedSystemId = event.target.value;
-        if (selectedSystemId === 'all') {
-            setSystem('all');
+        if (selectedSystemId === 'all' || selectedSystemId === 'none') {
+            setSystem(selectedSystemId);
             return;
         }
         const selectedSystem = systems.find(system => system.id === selectedSystemId) ?? null;
@@ -66,11 +66,18 @@ export default function Filters() {
                             <option value='all'>All</option>
                         </>
                     }
-                    {systems.length > 0 ? systems.map(system => (
-                        <option key={system.id} value={system.id}>
-                            {system.name}
-                        </option>
-                    )) :
+                    {systems.length > 0 ? 
+                        (<>
+                            {systems.map(system => (
+                                <option key={system.id} value={system.id}>
+                                    {system.name}
+                                </option>
+                            ))}
+                            <option value={'none'}>
+                                No system
+                            </option>
+                        </>)
+                    :
                         <option value=''>No systems found</option>
                     }
                 </select>

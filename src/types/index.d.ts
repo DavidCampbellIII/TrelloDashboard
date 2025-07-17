@@ -62,9 +62,9 @@ export type TrelloBoardRawExport = {
 
 export type TrelloTask = {
     labels: Label[];
-    system: string;
     status: TaskStatus;
-    hours: number;
+    system?: string;
+    hours?: number;
 };
 
 export type ProgressBarColors = {
