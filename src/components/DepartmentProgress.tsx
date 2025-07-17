@@ -16,19 +16,33 @@ export default function DepartmentProgress() {
         return 'No departments are working on the selected system';
     }
 
+    //filter out everything except the selected department
+    //so we can display it first and indent all related departments underneath it
+    const selectedDepartment = departmentProgress.find(data => data.label === department);
+    const filteredDepartments = departmentProgress.filter(data => data.label !== department);
+
   return (
     <div className='card'>
         <h2 className='text-2xl font-semibold text-white mb-4'>Department Progress</h2>
         <div className='flex flex-col gap-4'>
             {department && departmentProgress.length > 0 ? (
-                <div className='flex flex-col gap-4 text-white'>
-                    <h3 className='text-xl font-semibold'>{department}</h3>
-                    {departmentProgress.map(data => (
+                <div className='flex flex-col'>
+                    {selectedDepartment && (
                         <DepartmentProgressBar
-                            key={data.label}
-                            data={data}
+                            data={selectedDepartment}
                         />
-                    ))}
+                    )}
+                    <hr className='flex self-center w-full border-gray-600 my-4 bg-red-500' />
+                    <h3 className='text-lg font-semibold text-white mb-2'>Sharing Tasks With</h3>
+                    <div className='flex flex-col gap-4 ml-4 p-4 border-1 bg-gray-700/70 rounded-lg'>
+                        {filteredDepartments.map(data => (
+                            <DepartmentProgressBar
+                                key={data.label}
+                                data={data}
+                            />
+                        ))}
+                    </div>
+                    
                 </div> 
             ) : (
                 <div className='text-gray-500'>

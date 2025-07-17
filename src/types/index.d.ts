@@ -72,26 +72,46 @@ export type ProgressBarColors = {
     inProgressColor: string;
 };
 
+export type TaskProgressWithHours = {
+    notStarted: {
+        numTasks: number;
+        hours: number;
+    };
+    inProgress: {
+        numTasks: number;
+        hours: number;
+    };
+    completed: {
+        numTasks: number;
+        hours: number;
+    }
+};
+
+export type TaskProgressNoHours = {
+    notStarted: number;
+    inProgress: number;
+    completed: number;
+};
+
 export type ProgressBarData = {
     label: string;
     colors: ProgressBarColors;
-    tasksWithHours: {
-        notStarted: {
-            numTasks: number;
-            hours: number;
-        };
-        inProgress: {
-            numTasks: number;
-            hours: number;
-        };
-        completed: {
-            numTasks: number;
-            hours: number;
-        }
-    };
-    tasksWithoutHours: {
-        notStarted: number;
-        inProgress: number;
-        completed: number;
-    };
+    tasksWithHours: TaskProgressWithHours;
+    tasksWithoutHours: TaskProgressNoHours;
 };
+
+export type TaskProgressResults = {
+    tasksInProgress: number;
+    tasksCompleted: number;
+    totalTasks: number;
+
+    inProgressHours: number;
+    completedHours: number;
+    totalHours: number;
+
+    totalPointsFromTasks: number;
+    totalPointsFromHours: number;
+
+    inProgressPercentage: number;
+    completedPercentage: number;
+}

@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import useBoardStore from "./useBoardStore";
 import { getProgressBarColors } from "../util/utils";
 import { TaskStatus } from "../types/tasks";
-import type { ProgressBarData } from "../types";
+import type { Label, ProgressBarData, TaskProgressNoHours, TaskProgressWithHours, TrelloTask } from "../types";
 
 const useBoard = (department: string, system: string) => {
     const { tasks, labels } = useBoardStore();
@@ -32,55 +32,8 @@ const useBoard = (department: string, system: string) => {
     //finally, calculate the progress for each department
     const departmentProgress: ProgressBarData[] = useMemo(() => {
         const data = Object.entries(groupedTasks).map(([labelId, tasks]) => {
-            const tasksWithoutHours = {
-                notStarted: 0,
-                inProgress: 0,
-                completed: 0
-            };
-            const tasksWithHours = {
-                    notStarted: {
-                        numTasks: 0,
-                        hours: 0,
-                    },
-                    inProgress: {
-                        numTasks: 0,
-                        hours: 0
-                    },
-                    completed: {
-                        numTasks: 0,
-                        hours: 0,
-                    }
-                };
-
-            tasks.forEach(task => {
-                switch (task.status) {
-                    case TaskStatus.NotStarted:
-                        if (task.hours) {
-                            tasksWithHours.notStarted.numTasks++;
-                            tasksWithHours.notStarted.hours += task.hours;
-                        } else {
-                            tasksWithoutHours.notStarted++;
-                        }
-                        break;
-                    case TaskStatus.InProgress:
-                        if (task.hours) {
-                            tasksWithHours.inProgress.numTasks++;
-                            tasksWithHours.inProgress.hours += task.hours;
-                        } else {
-                            tasksWithoutHours.inProgress++;
-                        }
-                        break;
-                    case TaskStatus.Completed:
-                        if (task.hours) {
-                            tasksWithHours.completed.numTasks++;
-                            tasksWithHours.completed.hours += task.hours;
-                        } else {
-                            tasksWithoutHours.completed++;
-                        }
-                        break;
-                }
-            });
-
+            
+            const { tasksWithoutHours, tasksWithHours } = calcTaskHours(tasks);
             const label = labels.find(label => label.id === labelId);
 
             return {
@@ -97,13 +50,80 @@ const useBoard = (department: string, system: string) => {
             p.tasksWithoutHours.notStarted +
             p.tasksWithoutHours.inProgress;
 
-    //sort by largest backlog first
-    return data.sort((a, b) => outstanding(b) - outstanding(a));
+        //sort by largest backlog first
+        return data.sort((a, b) => outstanding(b) - outstanding(a));
     }, [groupedTasks, labels]);
 
+    const overallProgress: ProgressBarData = useMemo(() => {
+        const { tasksWithoutHours, tasksWithHours } = calcTaskHours(tasks);
+        
+        return {
+            label: 'all',
+            colors: getProgressBarColors({name: 'all'} as Label),
+            tasksWithHours,
+            tasksWithoutHours,
+        };
+    }, [tasks]);
+
     return {
+        overallProgress,
         departmentProgress
     };
+};
+
+const calcTaskHours = (tasks: TrelloTask[]): 
+    {tasksWithoutHours: TaskProgressNoHours, tasksWithHours: TaskProgressWithHours} => 
+{
+    const tasksWithoutHours: TaskProgressNoHours = {
+        notStarted: 0,
+        inProgress: 0,
+        completed: 0
+    };
+    const tasksWithHours: TaskProgressWithHours = {
+        notStarted: {
+            numTasks: 0,
+            hours: 0,
+        },
+        inProgress: {
+            numTasks: 0,
+            hours: 0
+        },
+        completed: {
+            numTasks: 0,
+            hours: 0,
+        }
+    };
+
+    tasks.forEach(task => {
+        switch (task.status) {
+            case TaskStatus.NotStarted:
+                if (task.hours) {
+                    tasksWithHours.notStarted.numTasks++;
+                    tasksWithHours.notStarted.hours += task.hours;
+                } else {
+                    tasksWithoutHours.notStarted++;
+                }
+                break;
+            case TaskStatus.InProgress:
+                if (task.hours) {
+                    tasksWithHours.inProgress.numTasks++;
+                    tasksWithHours.inProgress.hours += task.hours;
+                } else {
+                    tasksWithoutHours.inProgress++;
+                }
+                break;
+            case TaskStatus.Completed:
+                if (task.hours) {
+                    tasksWithHours.completed.numTasks++;
+                    tasksWithHours.completed.hours += task.hours;
+                } else {
+                    tasksWithoutHours.completed++;
+                }
+                break;
+        }
+    });
+
+    return { tasksWithoutHours, tasksWithHours };
 };
 
 export default useBoard;
