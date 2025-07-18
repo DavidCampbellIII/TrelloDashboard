@@ -1,4 +1,5 @@
 import useBoard from "../hooks/useBoard";
+import { ProgressBarVariant } from "../types/componentVariants";
 import { calcTaskProgress } from "../util/utils";
 import ProgressBar from "./ProgressBar";
 
@@ -32,7 +33,7 @@ export default function OverallProgress() {
                         colors={overallProgress.colors}
                         inProgressPercentage={inProgressPercentage}
                         completedPercentage={completedPercentage}
-                        variant="default"
+                        variant={ProgressBarVariant.Default}
                         barHeight="h-6 mt-2"
                     />
 
@@ -42,7 +43,7 @@ export default function OverallProgress() {
                         colors={overallProgress.colors}
                         inProgressPercentage={tasksInProgressPercentage}
                         completedPercentage={tasksCompletedPercentage}
-                        variant="default"
+                        variant={ProgressBarVariant.Compact}
                         barHeight="h-6 mt-2"
                     />
 
@@ -52,7 +53,7 @@ export default function OverallProgress() {
                         colors={overallProgress.colors}
                         inProgressPercentage={hoursInProgressPercentage}
                         completedPercentage={hoursCompletedPercentage}
-                        variant="default"
+                        variant={ProgressBarVariant.Compact}
                         barHeight="h-6 mt-2"
                     />
                     

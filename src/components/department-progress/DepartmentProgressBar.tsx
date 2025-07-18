@@ -1,12 +1,14 @@
-import type { ProgressBarData } from "../types";
-import { calcTaskProgress } from "../util/utils";
-import ProgressBar from "./ProgressBar";
+import type { ProgressBarData } from "../../types";
+import { ProgressBarVariant } from "../../types/componentVariants";
+import { calcTaskProgress } from "../../util/utils";
+import ProgressBar from "../ProgressBar";
 
 type Props = {
     data: ProgressBarData;
+    variant?: ProgressBarVariant;
 };
 
-export default function DepartmentProgressBar({ data }: Props) {
+export default function DepartmentProgressBar({ data, variant = ProgressBarVariant.Default }: Props) {
     const { 
         label, 
         colors, 
@@ -46,6 +48,7 @@ export default function DepartmentProgressBar({ data }: Props) {
         colors={colors}
         inProgressPercentage={inProgressPercentage}
         completedPercentage={completedPercentage}
+        variant={variant}
     />
   )
 }

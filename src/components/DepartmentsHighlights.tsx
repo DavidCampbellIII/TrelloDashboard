@@ -1,5 +1,6 @@
 import useBoard from "../hooks/useBoard";
 import type { TaskProgressResults } from "../types";
+import { ProgressBarVariant } from "../types/componentVariants";
 import { calcTaskProgress } from "../util/utils";
 import ProgressBar from "./ProgressBar";
 
@@ -43,13 +44,13 @@ export default function DepartmentsHighlights() {
                         <ProgressBar
                             key={data.label}
                             labelStart={data.label}
-                            labelEnd={`${data.completedPercentage.toFixed(1)}% completed`}
+                            labelEnd={`${data.completedPercentage.toFixed()}%`}
                             footerStart={footerStart(data)}
                             footerEnd={footerEnd(data)}
                             colors={data.colors}
                             inProgressPercentage={data.inProgressPercentage}
                             completedPercentage={data.completedPercentage}
-                            variant="compact"
+                            variant={ProgressBarVariant.Compact}
                         />
                     ))}
                     <div className='text-gray-500 text-xs mt-2'>
