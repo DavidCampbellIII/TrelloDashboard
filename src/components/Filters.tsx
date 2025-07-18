@@ -27,7 +27,7 @@ export default function Filters() {
 
   return (
     <div className='card'>
-        <h2 className='text-2xl font-semibold text-white mb-4'>Filters</h2>
+        <h2 className='text-3xl font-semibold text-white mb-4'>Filters</h2>
         <div className='flex gap-4'>
             <div className='flex flex-col gap-2'>
                 <label className='text-base text-subtitle' htmlFor='department-select'>

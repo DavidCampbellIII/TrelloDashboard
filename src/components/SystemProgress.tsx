@@ -40,7 +40,7 @@ export default function SystemProgress() {
 
   return (
     <div className='card'>
-        <h2 className='text-2xl font-semibold text-white mb-4'>Systems Progress</h2>
+        <h2 className='text-3xl font-semibold text-white mb-4'>Systems Progress</h2>
         <div className='flex flex-col gap-4'>
             {systemsProgress && systemsProgress.length > 0 ? (
                 <div className='flex flex-col gap-2 text-white'>

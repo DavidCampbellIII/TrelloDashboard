@@ -32,7 +32,7 @@ export default function ProgressBar({
     };
 
   return (
-    <div className={clsx('flex flex-col rounded-md bg-gray-900 shadow-blue-900/40', {
+    <div className={clsx('flex flex-col rounded-md bg-gray-900', {
         'shadow-md p-4': variant === ProgressBarVariant.Default,
         'shadow-sm p-2': variant === ProgressBarVariant.Compact,
     })}>

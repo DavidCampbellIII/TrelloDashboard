@@ -46,7 +46,7 @@ export default function DepartmentSystems({ department }: Props) {
     <div className='flex flex-col'>
         {
             systemsProgress.length > 0 && (
-                <div className='flex flex-col gap-2 ml-4 p-4 border-1 rounded-lg'>
+                <div className='flex flex-col gap-2 ml-8 rounded-lg'>
                     {taskProgressBySystem.map(data => (
                         <ProgressBar
                             key={data.label}

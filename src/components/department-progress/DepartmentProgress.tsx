@@ -55,7 +55,7 @@ export default function DepartmentProgress() {
 
   return (
     <div className='card'>
-        <h2 className='text-2xl font-semibold text-white mb-4'>Department Progress</h2>
+        <h2 className='text-3xl font-semibold text-white mb-4'>Department Progress</h2>
         <div className='flex flex-col gap-4'>
             {department && departmentProgress.length > 0 
             ? 

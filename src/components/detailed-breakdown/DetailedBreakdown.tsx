@@ -21,19 +21,22 @@ export default function DetailedBreakdown() {
 
   return (
     <div className='card'>
-        <h2 className='text-2xl font-semibold text-white mb-4'>Detailed Breakdown</h2>
+        <h2 className='text-3xl font-semibold text-white mb-4'>Detailed Breakdown</h2>
         <div className='flex flex-col gap-4'>
-            {departmentProgress.length > 0 ? departmentProgress.map(data => (<>
-                <DepartmentProgressBar
+            {departmentProgress.length > 0 ? departmentProgress.map(data => (
+                <div 
                     key={data.label}
-                    data={data}
-                    verboseLabelEnd={true}
-                />
-                <DepartmentSystems 
-                    key={`${data.label}-systems`}
-                    department={data.label}
-                />
-            </>))
+                    className='flex flex-col gap-4 rounded-lg border-1 border-gray-600/60 bg-gray-900/50'
+                >
+                    <DepartmentProgressBar
+                        data={data}
+                        verboseLabelEnd={true}
+                    />
+                    <DepartmentSystems 
+                        department={data.label}
+                    />
+                </div>
+            ))
             :
             (
                 <div className='text-gray-500'>

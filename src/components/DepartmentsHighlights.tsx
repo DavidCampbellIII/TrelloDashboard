@@ -36,7 +36,7 @@ export default function DepartmentsHighlights() {
 
   return (
     <div className='card'>
-        <h2 className='text-2xl font-semibold text-white mb-4'>Most Backlogged Department</h2>
+        <h2 className='text-3xl font-semibold text-white mb-4'>Most Backlogged Department</h2>
         <div className='flex flex-col gap-4'>
             {departmentProgress && departmentProgress.length > 0 ? (
                 <div className='flex flex-col gap-2 text-white'>
