@@ -6,7 +6,7 @@ import ProgressBar from "./ProgressBar";
 export default function SystemsHighlights() {
   const { systemsProgress } = useBoard('all', 'all');
 
-    const taskProgressByDepartment = systemsProgress.slice(0, 3).map(data => {
+    const taskProgressBySystem = systemsProgress.slice(0, 3).map(data => {
         const { 
             label, 
             colors, 
@@ -39,7 +39,7 @@ export default function SystemsHighlights() {
         <div className='flex flex-col gap-4'>
             {systemsProgress && systemsProgress.length > 0 ? (
                 <div className='flex flex-col gap-2 text-white'>
-                    {taskProgressByDepartment.map((data) => (
+                    {taskProgressBySystem.map((data) => (
                         <ProgressBar
                             key={data.label}
                             labelStart={data.label}

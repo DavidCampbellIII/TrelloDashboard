@@ -44,17 +44,18 @@ export default function DepartmentProgress() {
                             data={selectedDepartment}
                         />
                     )}
-                    <hr className='flex self-center w-full border-gray-600 my-4 bg-red-500' />
-                    <h3 className='text-lg font-semibold text-white mb-2'>Sharing Tasks With</h3>
-                    <div className='flex flex-col gap-4 ml-4 p-4 border-1 bg-gray-700/70 rounded-lg'>
-                        {filteredDepartments.map(data => (
-                            <DepartmentProgressBar
-                                key={data.label}
-                                data={data}
-                            />
-                        ))}
-                    </div>
-                    
+                    {filteredDepartments.length > 0 && (<>
+                        <hr className='flex self-center w-full border-gray-600 my-4' />
+                        <h3 className='text-lg font-semibold text-white mb-2'>Sharing Tasks With</h3>
+                        <div className='flex flex-col gap-4 ml-4 p-4 border-1 bg-gray-700/70 rounded-lg'>
+                            {filteredDepartments.map(data => (
+                                <DepartmentProgressBar
+                                    key={data.label}
+                                    data={data}
+                                />
+                            ))}
+                        </div>
+                    </>)}
                 </div> 
             ) : (
                 <div className='text-gray-500'>
