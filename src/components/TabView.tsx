@@ -1,7 +1,7 @@
 import { useState } from "react";
 import DepartmentProgress from "./department-progress/DepartmentProgress";
 import SystemProgress from "./SystemProgress";
-import DetailedBreakdown from "./DetailedBreakdown";
+import DetailedBreakdown from "./detailed-breakdown/DetailedBreakdown";
 import clsx from "clsx";
 import Filters from "./Filters";
 

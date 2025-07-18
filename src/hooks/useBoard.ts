@@ -4,7 +4,7 @@ import { getProgressBarColors } from "../util/utils";
 import { TaskStatus } from "../types/tasks";
 import type { Label, ProgressBarData, TaskProgressNoHours, TaskProgressWithHours, TrelloTask } from "../types";
 
-const useBoard = (department: string, system: string) => {
+const useBoard = (department: string = 'all', system: string = 'all') => {
     const { tasks, labels } = useBoardStore();
 
     //first, filter all tasks based on the selected department and system

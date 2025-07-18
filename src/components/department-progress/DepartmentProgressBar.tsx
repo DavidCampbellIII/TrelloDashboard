@@ -6,9 +6,10 @@ import ProgressBar from "../ProgressBar";
 type Props = {
     data: ProgressBarData;
     variant?: ProgressBarVariant;
+    verboseLabelEnd?: boolean;
 };
 
-export default function DepartmentProgressBar({ data, variant = ProgressBarVariant.Default }: Props) {
+export default function DepartmentProgressBar({ data, variant = ProgressBarVariant.Default, verboseLabelEnd = false }: Props) {
     const { 
         label, 
         colors, 
@@ -42,7 +43,7 @@ export default function DepartmentProgressBar({ data, variant = ProgressBarVaria
   return (
     <ProgressBar 
         labelStart={label}
-        labelEnd={`${completedPercentage.toFixed(1)}% completed`}
+        labelEnd={verboseLabelEnd ? `${completedPercentage.toFixed(1)}% completed` : `${completedPercentage.toFixed()}%`}
         footerStart={footerStart}
         footerEnd={footerEnd}
         colors={colors}

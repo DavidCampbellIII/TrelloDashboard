@@ -5,7 +5,7 @@ import { calcTaskProgress } from "../util/utils";
 import ProgressBar from "./ProgressBar";
 
 export default function SystemsHighlights() {
-    const { systemsProgress } = useBoard('all', 'all');
+    const { systemsProgress } = useBoard();
 
     const taskProgressBySystem = systemsProgress.slice(0, 3).map(data => {
         const { 

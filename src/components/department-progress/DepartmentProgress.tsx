@@ -39,6 +39,7 @@ export default function DepartmentProgress() {
                     <DepartmentProgressBar
                         key={data.label}
                         data={data}
+                        verboseLabelEnd={true}
                     />
                 ))}
             </div>

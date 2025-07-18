@@ -14,6 +14,7 @@ export default function DepartmentSharedTasks({ selectedDepartment, sharedDepart
         {selectedDepartment && (
             <DepartmentProgressBar
                 data={selectedDepartment}
+                verboseLabelEnd={true}
             />
         )}
         {

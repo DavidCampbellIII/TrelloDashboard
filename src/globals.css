@@ -6,11 +6,12 @@
   }
 
   .card {
-    @apply rounded-xl bg-gray-800 p-4 my-4 w-full;
+    @apply rounded-xl bg-gray-800 p-4 my-4 w-full border-1 border-gray-700 
+      shadow-lg transition-shadow hover:shadow-2xl;
   }
 }
 
-/* Custom color classes for Trello labels
+/* Color classes for Trello labels, aligns with Trello's label color naming conventions.
     Includes base colors, light variants, and dark variants.
     Also includes faded versions of each variant for in-progress indicators.
 */

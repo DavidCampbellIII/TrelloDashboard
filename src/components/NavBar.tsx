@@ -7,7 +7,7 @@ export default function NavBar() {
             <h1 className='text-5xl font-semibold text-white'>
                 Trello Dashboard
             </h1>
-            <h3 className="text-subtitle">Project progress at a glance</h3>
+            <h3 className="text-subtitle mt-1">Project progress at a glance</h3>
         </div>
         <ImportButton />
     </div>

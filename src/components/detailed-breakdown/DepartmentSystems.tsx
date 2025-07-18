@@ -1,11 +1,15 @@
-import useBoard from "../hooks/useBoard";
-import type { TaskProgressResults } from "../types";
-import { ProgressBarVariant } from "../types/componentVariants";
-import { calcTaskProgress } from "../util/utils";
-import ProgressBar from "./ProgressBar";
+import useBoard from "../../hooks/useBoard";
+import type { TaskProgressResults } from "../../types";
+import { ProgressBarVariant } from "../../types/componentVariants";
+import { calcTaskProgress } from "../../util/utils";
+import ProgressBar from "../ProgressBar";
 
-export default function SystemProgress() {
-    const { systemsProgress } = useBoard('all', 'all');
+type Props = {
+    department: string;
+}
+
+export default function DepartmentSystems({ department }: Props) {
+    const { systemsProgress } = useBoard(department, 'all');
 
     const taskProgressBySystem = systemsProgress.map(data => {
         const { 
@@ -39,31 +43,26 @@ export default function SystemProgress() {
     );
 
   return (
-    <div className='card'>
-        <h2 className='text-2xl font-semibold text-white mb-4'>Systems Progress</h2>
-        <div className='flex flex-col gap-4'>
-            {systemsProgress && systemsProgress.length > 0 ? (
-                <div className='flex flex-col gap-2 text-white'>
-                    {taskProgressBySystem.map((data) => (
+    <div className='flex flex-col'>
+        {
+            systemsProgress.length > 0 && (
+                <div className='flex flex-col gap-2 ml-4 p-4 border-1 rounded-lg'>
+                    {taskProgressBySystem.map(data => (
                         <ProgressBar
                             key={data.label}
                             labelStart={data.label}
-                            labelEnd={`${data.completedPercentage.toFixed()}% completed`}
+                            labelEnd={`${data.completedPercentage.toFixed()}%`}
                             footerStart={footerStart(data)}
                             footerEnd={footerEnd(data)}
                             colors={data.colors}
                             inProgressPercentage={data.inProgressPercentage}
                             completedPercentage={data.completedPercentage}
-                            variant={ProgressBarVariant.Default}
+                            variant={ProgressBarVariant.Compact}
                         />
                     ))}
-                </div> 
-            ) : (
-                <div className='text-gray-500'>
-                    <p>No tasks found</p>
                 </div>
-            )}
-        </div>
-    </div>
+            )
+        }
+    </div> 
   )
 }
