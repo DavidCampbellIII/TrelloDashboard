@@ -101,10 +101,12 @@ export type ProgressBarData = {
 };
 
 export type TaskProgressResults = {
+    tasksNotStarted: number;
     tasksInProgress: number;
     tasksCompleted: number;
     totalTasks: number;
 
+    hoursNotStarted: number;
     inProgressHours: number;
     completedHours: number;
     totalHours: number;

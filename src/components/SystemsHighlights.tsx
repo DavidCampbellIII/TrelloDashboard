@@ -24,7 +24,6 @@ export default function SystemsHighlights() {
     const footerStart = (data: TaskProgressResults) => (
         <>
             {data.tasksCompleted} / {data.totalTasks} tasks <br />
-            ({data.tasksInProgress} in progress)
         </>
     );
 
@@ -36,10 +35,10 @@ export default function SystemsHighlights() {
 
   return (
     <div className='card'>
-        <h2 className='text-2xl font-semibold text-white mb-4'>Most Backlogged System</h2>
+        <h2 className='text-2xl font-semibold text-white mb-4'>Most Backlogged Systems</h2>
         <div className='flex flex-col gap-4'>
             {systemsProgress && systemsProgress.length > 0 ? (
-                <div className='flex flex-col gap-4 text-white'>
+                <div className='flex flex-col gap-2 text-white'>
                     {taskProgressByDepartment.map((data) => (
                         <ProgressBar
                             key={data.label}
@@ -50,8 +49,12 @@ export default function SystemsHighlights() {
                             colors={data.colors}
                             inProgressPercentage={data.inProgressPercentage}
                             completedPercentage={data.completedPercentage}
+                            variant="compact"
                         />
                     ))}
+                    <div className='text-gray-500 text-xs mt-2'>
+                        Showing top 3 of {systemsProgress.length}
+                    </div>
                 </div> 
             ) : (
                 <div className='text-gray-500'>

@@ -56,10 +56,12 @@ export function calcTaskProgress(tasksWithHours: TaskProgressWithHours,
     const inProgressPercentage = totalPoints > 0 ? ((totalCompletedPoints + totalInProgressPoints) / totalPoints) * 100 : 0;
 
     return {
+        tasksNotStarted: (totalTasks - tasksInProgress - tasksCompleted),
         tasksInProgress,
         tasksCompleted,
         totalTasks,
 
+        hoursNotStarted: (totalHours - inProgressHours - completedHours),
         inProgressHours,
         completedHours,
         totalHours,

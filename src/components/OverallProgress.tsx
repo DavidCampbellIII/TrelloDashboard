@@ -6,27 +6,19 @@ export default function OverallProgress() {
     const { overallProgress } = useBoard('all', 'all');
 
     const { tasksCompleted, tasksInProgress, totalTasks,
-            completedHours, totalHours,
-            totalPointsFromTasks,
+            inProgressHours, completedHours, totalHours,
             completedPercentage, inProgressPercentage
         } = calcTaskProgress(overallProgress.tasksWithHours, overallProgress.tasksWithoutHours);
-        
-    
-        const footerStart = (
-            <>
-                {tasksCompleted} / {totalTasks} tasks <br />
-                ({tasksInProgress} in progress)
-            </>
-        );
-    
-        const footerEnd = (
-            <>
-                {completedHours} / {totalHours}hrs
-                {totalPointsFromTasks > 0 && (
-                    <> <br />+ {overallProgress.tasksWithoutHours.completed} tasks</>
-                )}
-            </>
-        );
+
+    const tasksCompletedPercentage = totalTasks > 0 ? (tasksCompleted / totalTasks) * 100 : 0;
+    //add completion percentage to get the total percentage value
+    const tasksInProgressPercentage = (totalTasks > 0 ? (tasksInProgress / totalTasks) * 100 : 0) + tasksCompletedPercentage;
+
+    console.log(`Tasks in progress: ${tasksInProgress}, (${tasksInProgressPercentage.toFixed(2)}%)`);
+
+    const hoursCompletedPercentage = totalHours > 0 ? (completedHours / totalHours) * 100 : 0;
+    //add completion percentage to get the total percentage value
+    const hoursInProgressPercentage = (totalHours > 0 ? (inProgressHours / totalHours) * 100 : 0) + hoursCompletedPercentage;
 
   return (
     <div className='card'>
@@ -35,15 +27,36 @@ export default function OverallProgress() {
             {totalTasks > 0 ? (
                 <div className='flex flex-col gap-4 text-white'>
                     <ProgressBar
-                        labelStart='Completion:'
-                        labelEnd={`${completedPercentage.toFixed(1)}% completed`}
-                        footerStart={footerStart}
-                        footerEnd={footerEnd}
+                        labelStart="Total Project Completion"
+                        labelEnd={`${completedPercentage.toFixed(2)}% complete`}
                         colors={overallProgress.colors}
                         inProgressPercentage={inProgressPercentage}
                         completedPercentage={completedPercentage}
+                        variant="default"
+                        barHeight="h-6 mt-2"
                     />
-                </div> 
+
+                    <ProgressBar
+                        labelStart="Tasks"
+                        labelEnd={`${tasksCompletedPercentage.toFixed(2)}% complete`}
+                        colors={overallProgress.colors}
+                        inProgressPercentage={tasksInProgressPercentage}
+                        completedPercentage={tasksCompletedPercentage}
+                        variant="default"
+                        barHeight="h-6 mt-2"
+                    />
+
+                    <ProgressBar
+                        labelStart="Hours"
+                        labelEnd={`${hoursCompletedPercentage.toFixed(2)}% complete`}
+                        colors={overallProgress.colors}
+                        inProgressPercentage={hoursInProgressPercentage}
+                        completedPercentage={hoursCompletedPercentage}
+                        variant="default"
+                        barHeight="h-6 mt-2"
+                    />
+                    
+                </div>
             ) : (
                 <div className='text-gray-500'>
                     <p>No tasks found</p>

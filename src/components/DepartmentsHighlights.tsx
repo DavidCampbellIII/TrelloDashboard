@@ -24,7 +24,6 @@ export default function DepartmentsHighlights() {
     const footerStart = (data: TaskProgressResults) => (
         <>
             {data.tasksCompleted} / {data.totalTasks} tasks <br />
-            ({data.tasksInProgress} in progress)
         </>
     );
 
@@ -39,7 +38,7 @@ export default function DepartmentsHighlights() {
         <h2 className='text-2xl font-semibold text-white mb-4'>Most Backlogged Department</h2>
         <div className='flex flex-col gap-4'>
             {departmentProgress && departmentProgress.length > 0 ? (
-                <div className='flex flex-col gap-4 text-white'>
+                <div className='flex flex-col gap-2 text-white'>
                     {taskProgressByDepartment.map((data) => (
                         <ProgressBar
                             key={data.label}
@@ -50,8 +49,12 @@ export default function DepartmentsHighlights() {
                             colors={data.colors}
                             inProgressPercentage={data.inProgressPercentage}
                             completedPercentage={data.completedPercentage}
+                            variant="compact"
                         />
                     ))}
+                    <div className='text-gray-500 text-xs mt-2'>
+                        Showing top 3 of {departmentProgress.length}
+                    </div>
                 </div> 
             ) : (
                 <div className='text-gray-500'>
