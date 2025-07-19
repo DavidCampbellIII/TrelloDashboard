@@ -4,8 +4,8 @@ import clsx from "clsx";
 import { ProgressBarVariant } from "../types/componentVariants";
 
 type Props = {
-    labelStart?: string;
-    labelEnd?: string;
+    labelStart?: ReactNode;
+    labelEnd?: ReactNode;
     footerStart?: ReactNode;
     footerEnd?: ReactNode;
     colors: ProgressBarColors;
