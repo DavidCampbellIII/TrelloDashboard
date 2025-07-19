@@ -3,7 +3,7 @@ import useFilterStore from "../hooks/useFiltersStore";
 
 export default function Filters() {
     const { labels: departments, systems } = useBoardStore();
-    const { setDepartment, setSystem } = useFilterStore();
+    const { setDepartment, setSystem, department, system } = useFilterStore();
 
     const handleSelectDepartment = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedDepartmentId = event.target.value;
@@ -37,6 +37,7 @@ export default function Filters() {
                     id='department-select' 
                     className='p-2 rounded bg-gray-700 text-white min-w-xs'
                     onChange={handleSelectDepartment}
+                    defaultValue={departments.find(dep => dep.name === department)?.id || 'all'}
                 >
                     {departments.length > 0 && <>
                             <option value='' disabled>Select a department</option>
@@ -60,6 +61,7 @@ export default function Filters() {
                     id='system-select' 
                     className='p-2 rounded bg-gray-700 text-white min-w-xs'
                     onChange={handleSelectSystem}
+                    defaultValue={systems.find(sys => sys.name === system)?.id || 'all'}
                 >
                     {systems.length > 0 && <>
                             <option value='' disabled>Select a system</option>
