@@ -20,8 +20,8 @@ export default function DepartmentSharedTasks({ selectedDepartment, sharedDepart
         {
             sharedDepartments.length > 0 && (<>
                 <hr className='flex self-center w-full border-gray-600 my-4' />
-                <h3 className='text-2xl font-semibold text-white mb-2 ml-4'>Sharing Tasks With</h3>
-                <div className='flex flex-col gap-2 ml-8 rounded-lg'>
+                <h3 className='text-2xl font-semibold text-white mb-2 ml-0 md:ml-4'>Sharing Tasks With</h3>
+                <div className='flex flex-col gap-2 ml-4 md:ml-8 rounded-lg'>
                     {sharedDepartments.map(data => (
                         <DepartmentProgressBar
                             key={data.label}

@@ -15,8 +15,6 @@ export default function OverallProgress() {
     //add completion percentage to get the total percentage value
     const tasksInProgressPercentage = (totalTasks > 0 ? (tasksInProgress / totalTasks) * 100 : 0) + tasksCompletedPercentage;
 
-    console.log(`Tasks in progress: ${tasksInProgress}, (${tasksInProgressPercentage.toFixed(2)}%)`);
-
     const hoursCompletedPercentage = totalHours > 0 ? (completedHours / totalHours) * 100 : 0;
     //add completion percentage to get the total percentage value
     const hoursInProgressPercentage = (totalHours > 0 ? (inProgressHours / totalHours) * 100 : 0) + hoursCompletedPercentage;

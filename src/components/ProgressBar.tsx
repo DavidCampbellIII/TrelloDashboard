@@ -37,7 +37,7 @@ export default function ProgressBar({
         'shadow-sm p-2': variant === ProgressBarVariant.Compact,
     })}>
         <div className='flex justify-between text-white'>
-            <h3 className={clsx('text-left', {
+            <h3 className={clsx('text-left w-full md:w-auto', {
                 'text-xl font-semibold': variant === ProgressBarVariant.Default,
                 'text-lg': variant === ProgressBarVariant.Compact
             })}>{labelStart}</h3>

@@ -1,12 +1,21 @@
 import { CiImport } from "react-icons/ci";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import useBoardStore from "../hooks/useBoardStore";
 import useFilterStore from "../hooks/useFiltersStore";
+import defaultBoardData from "../data/testBoard.json";
 
 export default function ImportButton() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { importData } = useBoardStore();
     const { setDepartment, setSystem } = useFilterStore();
+
+    //initialize with default data on first load
+    useEffect(() => {
+        importData(defaultBoardData);
+
+        setDepartment('all');
+        setSystem('all');
+    }, []);
 
     const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

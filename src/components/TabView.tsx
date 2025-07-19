@@ -19,9 +19,9 @@ export default function TabView() {
     const [tab, setTab] = useState(tabs[0].value);
 
   return (
-    <>
+    <div className="mx-2">
         <div className='flex flex-col gap-4 mt-4 mb-4 w-full justify-center'>
-            <div className='flex gap-4 justify-center'>
+            <div className='flex flex-col gap-2 md:flex-row md:gap-4 justify-center'>
                 {tabs.map(t => (
                     <button
                         key={t.value}
@@ -40,6 +40,6 @@ export default function TabView() {
         </div>
         
         {tabs.find(t => t.value === tab)?.view}
-    </>
+    </div>
   )
 }

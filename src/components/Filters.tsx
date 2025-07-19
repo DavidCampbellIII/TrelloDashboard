@@ -28,14 +28,14 @@ export default function Filters() {
   return (
     <div className='card'>
         <h2 className='text-3xl font-semibold text-white mb-4'>Filters</h2>
-        <div className='flex gap-4'>
+        <div className='flex flex-col md:flex-row gap-4'>
             <div className='flex flex-col gap-2'>
                 <label className='text-base text-subtitle' htmlFor='department-select'>
                 Department
                 </label>
                 <select 
                     id='department-select' 
-                    className='p-2 rounded bg-gray-700 text-white min-w-xs'
+                    className='p-2 rounded bg-gray-700 text-white md:min-w-xs'
                     onChange={handleSelectDepartment}
                     defaultValue={departments.find(dep => dep.name === department)?.id || 'all'}
                 >
@@ -59,7 +59,7 @@ export default function Filters() {
                 </label>
                 <select 
                     id='system-select' 
-                    className='p-2 rounded bg-gray-700 text-white min-w-xs'
+                    className='p-2 rounded bg-gray-700 text-white md:min-w-xs'
                     onChange={handleSelectSystem}
                     defaultValue={systems.find(sys => sys.name === system)?.id || 'all'}
                 >
