@@ -2,7 +2,8 @@ import { CiImport } from "react-icons/ci";
 import { useEffect, useRef } from "react";
 import useBoardStore from "../hooks/useBoardStore";
 import useFilterStore from "../hooks/useFiltersStore";
-import defaultBoardData from "../data/testBoard.json";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import type { TrelloBoardRawExport } from "../types";
 
 export default function ImportButton() {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -11,8 +12,17 @@ export default function ImportButton() {
 
     //initialize with default data on first load
     useEffect(() => {
-        importData(defaultBoardData);
+        const fetchData = async () => {
+            try {
+                const fetchTrelloBoard = httpsCallable(getFunctions(), 'fetchTrelloBoard');
+                const result = await fetchTrelloBoard();
+                importData(result.data as TrelloBoardRawExport);
+            } catch(error) {
+                console.error("Error fetching Trello board:", error);
+            }
+        };
 
+        fetchData();
         setDepartment('all');
         setSystem('all');
     }, []);
