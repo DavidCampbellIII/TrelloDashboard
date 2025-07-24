@@ -4,7 +4,7 @@
 import { readFile, writeFile } from "fs/promises";
 import { argv, cwd, exit } from "process";
 import { resolve } from "path";
-import type { TrelloBoardRawExport } from "../src/types";
+import type { TrelloBoardRawExport } from "../frontend/src/types";
 
 function filterTrelloExport(rawData: any): TrelloBoardRawExport {
   const filtered: TrelloBoardRawExport = {
