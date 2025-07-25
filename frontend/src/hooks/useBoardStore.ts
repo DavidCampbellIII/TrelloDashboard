@@ -7,6 +7,12 @@ type BoardState = {
     systems: SystemFieldOption[];
     lists: TrelloList[];
     tasks: TrelloTask[];
+
+    isLoading: boolean;
+    setIsLoading: (loading: boolean) => void;
+    error: string | null;
+    setError: (error: string | null) => void;
+
     importData: (data: TrelloBoardRawExport) => void;
 };
 
@@ -15,6 +21,11 @@ const useBoardStore = create<BoardState>((set) => ({
     systems: [],
     lists: [],
     tasks: [],
+    isLoading: false,
+    error: null,
+
+    setIsLoading: (loading: boolean) => set({ isLoading: loading }),
+    setError: (error: string | null) => set({ error }),
 
     importData: (data: TrelloBoardRawExport) => set(extractBoardData(data))
 }));

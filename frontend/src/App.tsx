@@ -1,4 +1,5 @@
 import DepartmentsHighlights from './components/DepartmentsHighlights';
+import LoadingData from './components/LoadingData';
 import NavBar from './components/NavBar';
 import OverallProgress from './components/OverallProgress';
 import SystemsHighlights from './components/SystemsHighlights';
@@ -16,6 +17,7 @@ export default function App() {
         </div>
         <TabView />
       </div>
+      <LoadingData />
     </div>
   )
 }

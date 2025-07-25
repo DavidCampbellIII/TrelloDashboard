@@ -1,4 +1,4 @@
-import ImportButton from "./ImportButton";
+import ReloadDataButton from "./ReloadDataButton";
 
 export default function NavBar() {
   return (
@@ -9,7 +9,7 @@ export default function NavBar() {
             </h1>
             <h3 className="text-subtitle mt-1">Project progress at a glance</h3>
         </div>
-        <div className='mt-4 flex w-full justify-end'><ImportButton /></div>
+        <div className='mt-4 flex w-full justify-end'><ReloadDataButton /></div>
     </div>
   )
 }
